@@ -1,5 +1,7 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include<iostream>
-using  namespace::std;
+#include<stdlib.h>
+using  namespace std;
 /*
 =========》形参带默认值的函数
 1.给默认值的时候从右向左给
@@ -271,14 +273,234 @@ int* const p = &a;//int*<===int*  const后无指针*，不参与类型
 ===========》const与一级指针、引用的结合应用
 解题思路：把const与一级指针、引用结合的表达式还原成指针去判断
 */
+//int main()
+//{
+//	//写一句代码，在内存的0x0018ff44处写一个4字节的10
+//	int*&& p = (int*)0x0018ff44;
+//	//int* const& p = (int*)0x0018ff44;
+//	
+//	//int a = 10;
+//	//int* p = &a;
+//	//int*& q = p;
+//	return 0;
+//}
+
+
+/*
+======》new和delete
+1.new和malloc的区别
+2.delete和free的区别
+new不仅可以做内存开辟，还可以做内存的初始化操作
+malloc开辟内存失败，是通过返回值和nullptr作比较；而new开辟内存失败是通过抛出bad_alloc类型的异常来判断
+malloc和free，都是C的库函数
+new和delete都是运算符
+3.new有多少种
+int *p1=new int(20);//抛出异常的new
+int *p2=new (nothrow) int;//不抛出异常的new
+const int *p3=new cosnt int(40);//在堆上开辟一个常量空间并初始化为40
+int *p4=new(某地址) int(50);定位new
+*/
+//int main()
+//{
+//	//int* p = new int(20);//开辟变量
+//	//delete p;//释放
+//
+//	//int* q1 = new int[20];//开辟一个大小为20整形数组，不做初始化
+//	//int* q2 = new int[20]();//辟一个大小为20整形数组,并将每一个元素初始化为0；
+//	//delete[]q1;//释放
+//	//delete[]q1;//释放
+//
+//	//定位new
+//	int data = 0;
+//	int* p4 = new(&data)int(50);
+//	cout << "data:" << data << endl;
+//	return 0;
+//}
+
+
+/*
+==========》C++ OPP面向对象
+C:各种各样的函数的定义
+C++:类===>实体的抽象类型
+实体(属性、行为)--->ADT(抽象数据类型)
+  |                  |
+对象     <---    (实例化)类(属性->成员变量  行为->成员方法)
+OOP语言的四大特征：
+抽象  
+封装/隐藏：通过访问限定符:public,private,protected
+继承  
+多态
+*/
+//const int NAME_LEN = 20;
+//class CGoods   //==>商品的抽象数据类型  类型不占空间   实例化的对象占空间
+//{
+//public://给外部提供公有的成员方法，来访问私有的属性
+//	//做商品数据初始化用
+//	void init(const char* name, double price, int amount);
+//	//打印商品信息
+//	void show();
+//	//给成员变量提供一组getXXX或setXXX的方法  类体内实现的方法，自动处理成内联函数
+//	void setName(char* name){strcpy(_name, name);}
+//
+//	void setPrice(double price){_price = price;}
+//	void setAmount(int amount){_amount = amount;}
+//
+//	const char* getName(){return _name;}
+//	double getPrince(){return _price;}
+//	int getAmount() {return _amount; }
+//private://属性一般都是私有的成员变量
+//	char _name[NAME_LEN];
+//	double _price;
+//	int _amount;
+//};
+//类外定义成员方法
+//void CGoods::init(const char* name, double price, int amount)
+//{
+//	strcpy(_name, name);
+//	_price = price;
+//	_amount = amount;
+//}
+//void CGoods::show()
+//{
+//	cout << "name:" << _name << endl;
+//	cout << "price:" << _price << endl;
+//	cout << "anount:" << _amount << endl;
+//}
+//int main()
+//{
+	/*
+	类可以实例化无数个对象
+	每一个对象都有自己的成员变量
+	但是他们共享一套成员方法
+	对象内存大小：对象的内存的大小只和成员变量有关
+
+	调用show()后如何知道处理哪个对象？
+	init(name,price,amount)===>怎么知道把信息初始化给哪一个对象？
+	类的成员方法一经编译，所有的方法参数，都会加一个this指针，接受调用该成员方法的对象的地址
+	this指针的作用：区分调用成员函数的对象
+	*/
+//	CGoods good;//类的实例化
+//	//实际调用中
+//	//init(&good1,"面包",10.0,200)
+//	good.init("面包", 10.0, 200);
+//	//show(&good1)
+//	good.show();
+//
+//	good.setPrice(20.5);
+//	good.setAmount(100);
+//	good.show();
+//
+//	CGoods good1;
+//	good1.init("空调",10000.0,50);//类的实例化
+//	good1.show();
+//	return 0;
+//}
+
+/*
+=======>构造函数和析构函数
+名字和类名一样，并且没有返回值
+不同的对象：
+栈上和.data段的内存系统会自动调用析构函数 先构造的后析构，后构造的先析构
+堆上开辟的内存需要手动delete  系统不会自动调用析构函数
+OOP实现一个顺序栈
+*/
+class SeqStack
+{
+public:
+	//构造函数
+	SeqStack(int size = 10)//带参数，一个类可以有多个构造函数
+	{
+		cout << this << " SeqStack()" << endl;//检查是否调用构造函数
+		_pstack = new int[size];
+		_top = -1;
+		_size = size;
+	}
+	//自己的写初始化函数,需要显式调用
+	//void init(int size = 10)
+	//{
+	//	_pstack = new int[size];
+	//	_top = -1;
+	//	_size = size;
+	//}
+	//析构函数：可以自己调用，但是不建议
+	~SeqStack()//不带参数，每一个类只能有一个析构
+	{
+		cout << this << " ~SeqStack()" << endl;//检查是否调用析构函数
+		delete[]_pstack;
+		_pstack = nullptr;
+	}
+	//自己写的释放资源函数，需要显式调用
+	//void release()
+	//{
+	//	delete[]_pstack;
+	//	_pstack = nullptr;
+	//}
+	void push(int val)
+	{
+		if (full())
+			resize();
+		_pstack[++_top] = val;
+	}
+	void pop()
+	{
+		if (empty())
+			return;
+		--_top;
+	}
+	int top()
+	{
+		return _pstack[_top];
+	}
+	bool empty()
+	{
+		return _top == -1;
+	}
+	bool full()
+	{
+		return _top == _size - 1;
+	}
+private:
+	int* _pstack;//动态开辟数组，存储顺序栈的元素
+	int _top;//指向栈顶元素的位置
+	int _size;//数组扩容后的总大小
+	void resize()
+	{
+		int* ptmp = new int[_size * 2];
+		for (int i = 0; i < _size; ++i)
+		{
+			ptmp[i] = _pstack[i];
+		}
+		delete[]_pstack;
+		_pstack = ptmp;
+		_size *= 2;
+	}
+};
+SeqStack s2;//在.data段上
 int main()
 {
-	//写一句代码，在内存的0x0018ff44处写一个4字节的10
-	int*&& p = (int*)0x0018ff44;
-	//int* const& p = (int*)0x0018ff44;
-	
-	//int a = 10;
-	//int* p = &a;
-	//int*& q = p;
-	return 0;
+	//定义对象：
+	//1.开辟内存
+	//2.调用构造函数
+	SeqStack s;//在栈上
+	SeqStack s1(50);//在栈上
+	SeqStack* ps = new SeqStack(60);//在堆上开辟，先malloc开辟内存，然后调用对象构造函数SeqStack()，堆上内存需要我们自己手动释放。
+	//s.init(5);//对象成员初始化操作
+	for (int i = 0; i < 15; i++)
+	{
+		s.push(rand() % 100);
+	}
+	while (!s.empty())
+	{
+		cout << s.top() << " ";
+		s.pop();
+	}
+	//s.release();//释放对象成员变量占用的外部堆内存(外部资源)
+	cout << endl;
+
+	ps->push(70);
+	ps->push(80);
+	ps->pop();
+	cout << ps->top() << endl;
+	delete ps;//先调用ps->~SeqStack(),然后free(ps)
+	return 0;//出作用域时自动调用析构函数
 }
