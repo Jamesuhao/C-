@@ -14,7 +14,7 @@ public:
 	Date& operator--();    
 	Date operator--(int);    
 	Date& operator-=(int day);
-	Date operator+=(int day);
+	Date& operator+=(int day);
 	bool operator>(const Date& d)const;    
 	bool operator>=(const Date& d)const;    
 	bool operator<(const Date& d)const;    
