@@ -1381,5 +1381,106 @@ int main()
 	cout << q1.front() << endl;
 	return 0;
 }
-#endif
 
+
+/*
+类模板==》实现一个C++  STL的一个顺序容器 vector向量容器
+//还差一个空间配置器
+*/
+template<typename T>
+class vector
+{
+public:
+	vector(int size = 10)
+	{
+		_first = new T[size];
+		_last = _first;
+		_end = _first + size;
+	}
+	~vector()
+	{
+		delete[]_first;
+		_last = _end = nullptr;
+	}
+	vector(const vector<T>& rhs)
+	{
+		int size = rhs._end - rhs._first;
+		_first = new T[size];
+		int len = rhs._last - rhs._first;
+		for (int i = 0; i < len; ++i)
+		{
+			_first[i] = rhs._first[i];
+		}
+		_last = _first + len;
+		_end = _first + size;
+	}
+	vector<T>& operator=(const vector<T>& rhs)
+	{
+		if (this == &rhs)
+			return *this;
+		delete[]_first;
+		int size = rhs._end - rhs._first;
+		int len = rhs._last - rhs._first;
+		_first = new T[size];
+		for (int i = 0; i < len; ++i)
+		{
+			_first[i] = rhs._first[i];
+		}
+		_end = _first + size;
+		_last = _first + len;
+		return *this;
+	}
+	void push_back(const T& val)//向容器末尾添加参数
+	{
+		if (full())
+			expand();
+		*_last++ = val;
+	}
+	void pop_back()//从末尾删除元素
+	{
+		if (empty())
+			return;
+		--_last;
+	}
+	T back()const//返回容器最后一个有效元素的值
+	{
+		return *(_last - 1);
+	}
+	bool full()const { return _last == _end; }
+	bool empty()const { return _last == _first; }
+	int size()const { return _last - _first; }
+private:
+	T* _first;//指向数组起始的位置
+	T* _last;//指向数组中有效元素的后继位置
+	T* _end;//指向数组空间的后继位置
+	void expand()//容器的二倍扩容操作
+	{
+		int size = _end - _first;
+		T* ptmp = new T[size * 2];
+		for (int i = 0; i < size; ++i)
+		{
+			ptmp[i] = _first[i];
+		}
+		delete[]_first;
+		_first = ptmp;
+		_last = _first + size;
+		_end = _first + size * 2;
+	}
+};
+int main()
+{
+	vector<int>vec;
+	for (int i = 0; i < 20; ++i)
+	{
+		vec.push_back(rand() % 100);
+	}
+	vec.pop_back();
+	while (!vec.empty())
+	{
+		cout << vec.back() << " ";
+		vec.pop_back();
+	}
+	cout << endl;
+	return 0;
+}
+#endif
