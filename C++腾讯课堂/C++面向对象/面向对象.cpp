@@ -1,8 +1,8 @@
-#if 0
 #define _CRT_SECURE_NO_WARNINGS
 #include<iostream>
 #include<stdlib.h>
 using  namespace std;
+#if 0
 /*
 ==========》C++ OPP面向对象
 C:各种各样的函数的定义

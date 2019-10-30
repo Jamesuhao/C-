@@ -2,6 +2,8 @@
 #include<iostream>
 #include<stdlib.h>
 using  namespace std;
+
+#if 0 
 /*
 C++的运算符重载：使对象的运算符表现得和编译器内置类型一样
 template<typename T>
@@ -369,9 +371,15 @@ int main()
 	return 0;
 }
 /*
-类模板 == 》实现一个C++  STL的一个顺序容器 vector向量容器 + 空间配置器
+类模板 == 》实现一个C++  STL的一个顺序容器 vector向量容器 + 空间配置器 + 迭代器
 容器的空间配置器allocator：
 做四件事：内存开辟 / 内存释放  对象构造 / 对象析构
+迭代器：
+1.定义实现迭代器(迭代器一般实现成容器嵌套类型):class  其底层存储的数据是什么类型迭代器的私有成员即为什么类型
+2.实现容器的两个方法：begin()和end()
+3.实现!=运算符的重载、前置++运算符的重载、*解引用运算符的重载
+4.可以使用auto关键字或者类名::itreator定义容器的迭代器
+5.遍历时可以使用foreach或者标准循环来遍历
 */
 //定义容器的空间配置器，和C++标准库的allocator实现一样
 template<typename T>
@@ -484,6 +492,40 @@ public:
 	bool full()const { return _last == _end; }
 	bool empty()const { return _last == _first; }
 	int size()const { return _last - _first; }
+	T& operator[](int index) 
+	{ 
+		if (index < 0 || index >= size())
+			throw"OuutOfRangeException";
+		return _first[index];
+	}
+	//迭代器一般实现成容器嵌套类型
+	class iterator
+	{
+	public:
+		//构造函数
+		iterator(T* ptr = nullptr)
+			:_ptr(ptr)
+		{ }
+		//！=运算符重载
+		bool operator!=(const iterator& it)const
+		{
+			return _ptr != it._ptr;
+		}
+		//前置++运算符重载
+		void operator++()
+		{
+			_ptr++;
+		}
+		//*解引用运算符重载
+		T& operator*() { return *_ptr; }
+		const T& operator*()const { return *_ptr; }
+	private:
+		T* _ptr;
+	};
+	//需要给容器提供begin和end方法
+	iterator begin() { return iterator(_first); }
+	iterator end() { return iterator(_last); }
+
 private:
 	T* _first;//指向数组起始的位置
 	T* _last;//指向数组中有效元素的后继位置
@@ -510,35 +552,35 @@ private:
 		_end = _first + size * 2;
 	}
 };
-class Test
-{
-public:
-	Test() { cout << "Test()" << endl; }
-	~Test() { cout << "~Test()" << endl; }
-	Test(const Test&) { cout << "Test(const Test&)" << endl; }
-};
 int main()
 {
-	//vector<int>vec;
-	//for (int i = 0; i < 20; ++i)
-	//{
-	//	vec.push_back(rand() % 100);
-	//}
-	//vec.pop_back();
-	//while (!vec.empty())
-	//{
-	//	cout << vec.back() << " ";
-	//	vec.pop_back();
-	//}
-	//cout << endl;
-	Test t1, t2, t3;
-	cout << "------------------------------" << endl;
-	vector<Test>vec;
-	vec.push_back(t1);
-	vec.push_back(t2);
-	vec.push_back(t3);
-	cout << "------------------------------" << endl;
-	vec.pop_back();//只需要析构对象，要把对象的析构和内存的释放分开
-	cout << "------------------------------" << endl;
+	vector<int>vec;
+	for (int i = 0; i < 20; ++i)
+	{
+		vec.push_back(rand() % 100 + 1);
+	}
+	//仅有底层数据结构为线性的时，才可使用这种方法遍历
+	int size = vec.size();
+	for (int i = 0; i < size; ++i)
+		cout << vec[i] << " ";
+	cout << endl;
+
+	//迭代器遍历  通用的
+	//也可写成：
+	auto it = vec.begin();
+	//vector<int>::iterator it = vec.begin();
+
+	for (; it != vec.end(); ++it)
+	{
+		cout << *it << " ";
+	}
+	cout << endl;
+	for (int val : vec)
+	{
+		cout << val << " ";
+	}
+	cout << endl;
 	return 0;
 }
+#endif
+
