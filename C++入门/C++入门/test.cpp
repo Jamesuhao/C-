@@ -266,7 +266,7 @@ int main()
 	int&& d = 20;//右值引用
 	d = 30;//d可以修改
 	int& e = d;//一个右值引用变量，本身是一个左值
-	右值引用和常引用汇编指令是一样的 
+	//右值引用和常引用汇编指令是一样的 
 	return 0;
 }
 
@@ -1174,7 +1174,6 @@ int main()
 类模板 ==> 实例化 ==>类模板
 可以有默认的类型参数
 */
-
 //类模板
 template<typename T>
 //template<typename T=int> //带默认类型参数的类模板
@@ -1560,7 +1559,7 @@ int main()
 	cout << "------------------------------" << endl;
 	return 0;
 }
-#endif
+
 
 /*
 C++的运算符重载：使对象的运算符表现得和编译器内置类型一样
@@ -1626,6 +1625,7 @@ private:
 	int mimage;
 	friend CComplex operator+(const CComplex& lhs, const CComplex& rhs);
 	friend ostream& operator<<(ostream& out, const CComplex& src);
+	friend istream& operator>>(istream& in, CComplex& src);
 };
 CComplex operator+(const CComplex& lhs, const CComplex& rhs)
 {
@@ -1636,6 +1636,11 @@ ostream& operator<<(ostream& out, const CComplex& src)
 {
 	out << "mreal:" << src.mreal << "  mimage:" << src.mimage << endl;
 	return out;
+}
+istream& operator>>(istream& in, CComplex& src)
+{
+	in >> src.mreal>> src.mimage;
+	return in;
 }
 int main()
 {
@@ -1662,8 +1667,264 @@ int main()
 	comp1 += comp2;
 	comp1.show();
 	comp2.show();
+	cin >> comp1 >> comp4;
+	cout << comp4 << endl;
+	cout << comp1 << endl;
 	cout << comp2 << endl; //对象信息的输出
-	cout << 10 << endl;
 	
 	return 0;
-}   
+} 
+ 
+/*
+string类
+
+*/
+#include<string>
+//模式实现String类
+class String
+{
+public:
+	String(const char* p = nullptr)
+	{
+		cout << "String()" << endl;
+		if (p != nullptr)
+		{
+			_pstr = new char[strlen(p) + 1];
+			strcpy(_pstr, p);
+		}
+		else
+		{
+			_pstr = new char[1];
+			*_pstr = '\0';
+		}
+	}
+	~String()
+	{
+		cout << "~String()" << endl;
+		delete[]_pstr;
+		_pstr = nullptr;
+	}
+	String(const String &str)
+	{
+		_pstr = new char[strlen(str._pstr) + 1];
+		strcpy(_pstr, str._pstr);
+	}
+	String& operator=(const String& str)
+	{
+		if (this == &str)
+			return*this;
+		delete[]_pstr;
+		_pstr = new char[strlen(str._pstr) + 1];
+		strcpy(_pstr, str._pstr);
+		return *this;
+	}
+	bool operator>(const String& str)const
+	{
+		return strcmp(_pstr, str._pstr) > 0;
+	}
+	bool operator<(const String& str)const
+	{
+		return strcmp(_pstr, str._pstr) < 0;
+	}
+	bool operator==(const String& str)const
+	{
+		return strcmp(_pstr, str._pstr) == 0;
+	}
+	int length()const { return strlen(_pstr); }
+	const char* c_str() const  { return _pstr; }
+	//可读可写
+	char& operator[](int index) { return _pstr[index]; }
+	//常对象调用，只读不改
+	char& operator[](int index)const { return _pstr[index]; }
+private:
+	char* _pstr;
+	friend String operator+(const String& lhs, const String& rhs);
+	friend ostream& operator<<(ostream& out, const String& str);
+	friend istream& operator>>(istream& in, String& str);
+};
+String operator+(const String& lhs, const String& rhs)
+{
+	//效率较低
+	//char* ptmp = new char[strlen(lhs._pstr) + strlen(rhs._pstr) + 1];
+	//strcpy(ptmp, lhs._pstr);
+	//strcat(ptmp,rhs._pstr);
+	//String tmp(ptmp);
+	//delete[]ptmp;
+	//return tmp;
+
+	//优化
+	String tmp;
+	tmp._pstr = new char[strlen(lhs._pstr) + strlen(rhs._pstr) + 1];
+	strcpy(tmp._pstr, lhs._pstr);
+	strcat(tmp._pstr, rhs._pstr);
+	return tmp._pstr;
+	//在优化：
+	//后续补充
+}
+ostream& operator<<(ostream& out, const String& str)
+{
+	out << str._pstr;
+	return out;
+}
+istream& operator>>(istream& in, String& str)
+{
+	in >> str._pstr;
+	return in;
+}
+int main()
+{
+	String a1="bbbbb";
+	String a2 = "aaaa";
+	String a3 = a1 + a2;
+	cout << a3 << endl;
+	//char buff[1024] = { 0 };
+	//strcpy(buff, a3.c_str());
+	//cout << "buff: " << buff << endl;
+	//cin >> a3;
+	//cout << a3 << endl;
+	return 0;
+}
+
+
+/*
+======》字符串对象的迭代器iterator实现:是容器的一种嵌套使用
+容器中有两种方法：
+1.begin():返回底层数据结构中首元素的迭代器
+2.end():返回底层数据结构中末尾元素后继位置的迭代器
+
+迭代器的功能：
+提供一种统一的方式，来透明的遍历容器。
+
+迭代器可以透明的访问容器内部的元素的值：
+我们无需关心容器底层中数据是以什么数据结构存储的，我们只需要关心这组数据的起始位置和结束位置，然后对迭代器进行递增访问即可
+
+迭代器多使用于泛型算法：
+1.泛型算法参数接收的都是迭代器!
+2.泛型算法是一组全局的函数，是给所有的容器用的!
+3.泛型算法，有一套方式，能够统一的遍历所有的容器的元素，我们所说的方法即迭代器。
+*/
+class String
+{
+public:
+	String(const char* p = nullptr)
+	{
+		cout << "String()" << endl;
+		if (p != nullptr)
+		{
+			_pstr = new char[strlen(p) + 1];
+			strcpy(_pstr, p);
+		}
+		else
+		{
+			_pstr = new char[1];
+			*_pstr = '\0';
+		}
+	}
+	~String()
+	{
+		cout << "~String()" << endl;
+		delete[]_pstr;
+		_pstr = nullptr;
+	}
+	String(const String& str)
+	{
+		_pstr = new char[strlen(str._pstr) + 1];
+		strcpy(_pstr, str._pstr);
+	}
+	String& operator=(const String& str)
+	{
+		if (this == &str)
+			return*this;
+		delete[]_pstr;
+		_pstr = new char[strlen(str._pstr) + 1];
+		strcpy(_pstr, str._pstr);
+		return *this;
+	}
+	bool operator>(const String& str)const
+	{
+		return strcmp(_pstr, str._pstr) > 0;
+	}
+	bool operator<(const String& str)const
+	{
+		return strcmp(_pstr, str._pstr) < 0;
+	}
+	bool operator==(const String& str)const
+	{
+		return strcmp(_pstr, str._pstr) == 0;
+	}
+	int length()const { return strlen(_pstr); }
+	const char* c_str() const { return _pstr; }
+	//可读可写
+	char& operator[](int index) { return _pstr[index]; }
+	//常对象调用，只读不改
+	char& operator[](int index)const { return _pstr[index]; }
+
+	//给String字符串类型提供迭代器的实现
+	class iterator
+	{
+	public:
+		iterator(char*p=nullptr)
+			:_p(p)
+		{ }
+		bool operator!=(const iterator& it)
+		{
+			return _p != it._p;
+		}
+		void operator++()
+		{
+			++_p;
+		}
+		char& operator*() { return *_p; }
+	private:
+		char* _p;
+	};
+	//begin()返回的是容器底层首元素的迭代器的表示
+	iterator begin() { return iterator(_pstr); }
+	//end()返回的是容器末尾元素后继位置的迭代器的表示
+	iterator end() { return iterator(_pstr + length()); }
+private:
+	char* _pstr;
+	friend String operator+(const String& lhs, const String& rhs);
+	friend ostream& operator<<(ostream& out, const String& str);
+	friend istream& operator>>(istream& in, String& str);
+};
+String operator+(const String& lhs, const String& rhs)
+{
+	String tmp;
+	tmp._pstr = new char[strlen(lhs._pstr) + strlen(rhs._pstr) + 1];
+	strcpy(tmp._pstr, lhs._pstr);
+	strcat(tmp._pstr, rhs._pstr);
+	return tmp._pstr;
+}
+ostream& operator<<(ostream& out, const String& str)
+{
+	out << str._pstr;
+	return out;
+}
+istream& operator>>(istream& in, String& str)
+{
+	in >> str._pstr;
+	return in;
+}
+int main()
+{
+	String str1 = "hello world!";//str1叫容器吗？底层放了一组char类型的字符
+	//容器的迭代器类型
+	String::iterator it = str1.begin();
+	//也可以使用auto关键字来定义
+	//auto it = str1.begin();
+	for (; it != str1.end(); ++it)
+	{
+		cout << *it << " ";
+	}
+	cout << endl;
+	
+	//c++11:以foreach的方式来遍历容器的内部元素==>底层还是通过迭代器进行遍历的，去掉begin和end方法后就无法遍历了
+	for (char ch : str1)
+	{
+		cout << ch << " ";
+	}
+	cout << endl;
+	return 0;
+}
+#endif 
