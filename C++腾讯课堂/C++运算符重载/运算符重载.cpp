@@ -1,6 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include<iostream>
 #include<stdlib.h>
+//#include<vector>
 using  namespace std;
 
 #if 0 
@@ -370,6 +371,7 @@ int main()
 	cout << endl;
 	return 0;
 }
+#endif
 /*
 类模板 == 》实现一个C++  STL的一个顺序容器 vector向量容器 + 空间配置器 + 迭代器
 容器的空间配置器allocator：
@@ -467,7 +469,7 @@ public:
 		_last = _first + len;
 		return *this;
 	}
-	void push_back(const T& val)//向容器末尾添加参数
+	void push_back(const T& val)//向容器末尾添加元素
 	{
 		if (full())
 			expand();
@@ -480,6 +482,12 @@ public:
 	{
 		if (empty())
 			return;
+		//erase(it)；
+		//verify(it._ptr,_last)//检查从删除位置至末尾位置是否有效
+		//insert(it,val)
+		//verify(it._ptr,_last)//检查从插入位置至末尾位置是否有效
+		//检查将要删除的位置元素是否有效
+		verify(_last - 1, _last);
 		//--_last;
 		//不仅要把_last指针--，还需要析构删除的元素
 		--_last;
@@ -502,35 +510,102 @@ public:
 	class iterator
 	{
 	public:
+		friend class vector<T, Alloc>;
 		//构造函数
-		iterator(T* ptr = nullptr)
+		iterator(vector<T, Alloc>* pvec = nullptr
+			, T* ptr = nullptr)
 			:_ptr(ptr)
-		{ }
-		//！=运算符重载
+			,_pVec(pvec)
+		{ 
+			Iterator_Base* itb =
+				new Iterator_Base(this, _pVec->_head._next);
+			_pVec->head._next = itb;
+		}
+		//!=运算符重载
 		bool operator!=(const iterator& it)const
 		{
+			//检查迭代器的有效性
+			if (_pVec == nullptr || _pVec != it._pVec)
+			{
+				throw"iterotar incompatable!"; 
+			}
 			return _ptr != it._ptr;
 		}
 		//前置++运算符重载
 		void operator++()
 		{
+			//检查迭代器的有效性
+			if (_pVec == nullptr )
+			{
+				throw"iterotar incompatable!";
+			}
 			_ptr++;
 		}
 		//*解引用运算符重载
-		T& operator*() { return *_ptr; }
-		const T& operator*()const { return *_ptr; }
+		T& operator*() 
+		{
+			//检查迭代器的有效性
+			if (_pVec == nullptr)
+			{
+				throw"iterotar incompatable!";
+			}
+			return *_ptr;
+		}
+		const T& operator*()const 
+		{
+			//检查迭代器的有效性
+			if (_pVec == nullptr)
+			{
+				throw"iterotar incompatable!";
+			}
+			return *_ptr; 
+		}
 	private:
 		T* _ptr;
+		//当前迭代器迭代的是那个对象
+		vector<T, Alloc>* _pVec;
 	};
 	//需要给容器提供begin和end方法
-	iterator begin() { return iterator(_first); }
-	iterator end() { return iterator(_last); }
-
+	iterator begin() { return iterator(this, _first); }
+	iterator end() { return iterator(this, _last); }
+	//检查迭代器失效
+	void verify(T* first, T* last)
+	{
+		Iterator_Base* pre = &this->_head;
+		Iterator_Base* it = this->_head.next;
+		while (it != nullptr)
+		{
+			if (it->_cur->_ptr >= first&& it->_cur->_ptr <= last)
+			{
+				//迭代器失效，把iterator持有的容器指针置nullptr
+				it->_next->_pVec = nullptr;
+				//删除当前迭代器结点，继续判断后面的迭代器结点是否失效
+				pre->_next = it->next;
+				delete it;
+				it->pre->_next;
+			}
+			else
+			{
+				pre = it;
+				it = it->_next;
+			}
+		}
+	}
 private:
 	T* _first;//指向数组起始的位置
 	T* _last;//指向数组中有效元素的后继位置
 	T* _end;//指向数组空间的后继位置
 	Alloc _allocator;//定义容器的空间配置器对象
+	struct Iterator_Base
+	{
+		Iterator_Base(iterator* c = nullptr, Iterator_Base *n= nullptr)
+			:_cur(c)
+			, _next(n)
+		{ }
+		iterator* _cur;
+		Iterator_Base* _next;
+	};
+	Iterator_Base _head;
 	void expand()//容器的二倍扩容操作
 	{
 		int size = _end - _first;
@@ -582,5 +657,85 @@ int main()
 	cout << endl;
 	return 0;
 }
-#endif
 
+#if 0
+/*
+======》迭代器的失效问题:使用库中的迭代器来引出问题所在
+1.迭代器为什么会失效？
+===>a：第一次调用erase以后，迭代器就失效了
+当我们删除迭代器某一位置的元素后，迭代器即从删除位置到迭代器末尾位置全部失效
+===>b：第一次调用insert后，迭代器就失效了
+当我们为迭代器在某一位置增加元素后，迭代器即从增加位置到迭代器末尾位置全部失效
+      迭代器依然有效果     迭代器全部失效
+首元素         —>    插入点/删除点     —>末尾元素    
+===>c：当我们增加元素时，需要为迭代器扩容时，扩容后，原迭代器则全部失效
+当我们为迭代器扩容后，就要重新开辟内存存放数据，则原迭代器将全部失效
+        原来容器的所有迭代器就全部失效了
+首元素          —>   插入点/删除点     —>末尾元素
+===>d：不同容器的迭代器是不能进行比较运算的
+
+2.迭代器失效了以后，问题该怎么解决？
+对插入/删除点的迭代器进行更新操作
+*/
+int main()
+{
+	vector<int>vec;
+	for (int i = 0; i < 20; ++i)
+	{
+		vec.push_back(rand() % 100 + 1);
+	}
+	for (int v : vec)
+	{
+		cout << v << " ";
+	}
+	cout << endl;
+	//问题1：把vec容器中所有的偶数全部删除
+	auto it = vec.begin();
+	//失效
+	for (; it != vec.end(); ++it)
+	{
+		if (*it % 2 == 0)
+		{
+			vec.erase(it);
+		}
+	}
+	//解决问题
+	while (it != vec.end())
+	{
+		//迭代器失效问题1：第一次调用erase以后，迭代器就失效了
+		if (*it % 2 == 0)
+		{
+			it = vec.erase(it);//更新迭代器
+		}
+		else
+		{
+			++it;
+		}
+	}
+	for (int v : vec)
+	{
+		cout << v << " ";
+	}
+	cout << endl;
+	//问题2：给vec容器中所有的偶数前面添加一个小于偶数值1的数字
+	auto it = vec.begin();
+	for (; it != vec.end(); ++it)
+	{
+		//迭代器失效问题2：迭代器在第一次调用insert后，迭代器就失效了
+		if (*it % 2 == 0)
+		{
+			//失效
+			//vec.insert(it, *it - 1);
+			//问题解决
+			it = vec.insert(it, *it - 1);
+			++it;
+		}
+	}
+	for (int v : vec)
+	{
+		cout << v << " ";
+	}
+	cout << endl;
+	return 0;
+}
+#endif

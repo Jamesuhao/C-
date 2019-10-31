@@ -1,8 +1,9 @@
+#if 0
 #define _CRT_SECURE_NO_WARNINGS
 #include<iostream>
 #include<stdlib.h>
 using  namespace std;
-#if 0
+
 /*
 C++模板中，所有的模板参数的生命周期只是类或者函数的左括号到右括号
 ====》C++函数模板

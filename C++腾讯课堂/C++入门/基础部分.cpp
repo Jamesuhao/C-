@@ -1,8 +1,9 @@
+#if 0
 #define _crt_secure_no_warnings
 #include<iostream>
 #include<stdlib.h>
 using  namespace std;
-#if 0
+
 /*
 =========》形参带默认值的函数
 1.给默认值的时候从右向左给
