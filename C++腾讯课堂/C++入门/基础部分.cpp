@@ -1,14 +1,14 @@
-#if 0
+
 #define _crt_secure_no_warnings
 #include<iostream>
 #include<stdlib.h>
 using  namespace std;
-
+#if 0
 /*
 =========》形参带默认值的函数
 1.给默认值的时候从右向左给
 2.相对于普通调用函数而言效率更高，传参时，会少mov指令
-3，定义处可以给形参默认处，声明也可以给形参默认值，但每一个形参只能给一次
+3，定义处可以给形参默认值，声明也可以给形参默认值，但每一个形参只能给一次
 4.下列声明方式也是可以的
 int sum(int a, int b = 20);
 int sum(int a = 20, int b);
@@ -117,7 +117,6 @@ int main()
 ==========>const修饰指针变量
 1.如何理解const？
 const修饰的变量不能够再作为左值!!!  初始化完成后值不能被修改
-
 2.c和c++中const的区别是什么？
 (1)c中const修饰的量，可以不用初始化，但是不叫常量，叫做常变量,其不能作为左值被修改，但是其内存中的值可以被修改。
 (2)c++的const必须初始化，叫做常量。
@@ -128,11 +127,9 @@ c++中，所有出现const常量的地方，都被常量的初始化值替换掉了，初始化值必须为立即数
 int b = 20;
 const int a = b;
 此时a不再是常量，已经退化成常变量，因为初始化值不是立即数，是一个变量。
-
 3.const修饰的常量经常出现的错误是：
 (1)直接修改常量的值====》常量不能作为左值
 (2)间接修改常量的值====》不能把常量的地址泄露给一个普通的指针或者普通的引用变量
-
 4.const和一级指针的结合：修饰指向和所指的内存中的值
 c++的语言规范：cosnt修饰的是离它最近的类型。
 记忆方法：去掉const所修饰的类型即为不能改变的常量
@@ -144,7 +141,6 @@ c++的语言规范：cosnt修饰的是离它最近的类型。
 即这个指针p现在是常量，不能再指向其他内存，但是可以通过指针解引用修改指针所指内存单元中的值
 (3)const int *const p = &a; ===>p = &b//错误 *p=30;//错误
 以上两种情况的结合，指针的指向和所指内存单元的值绝不能被修改
-
 5.const和二级指针的结合
 (1)const int* *q;修饰的是**q,所以*q和q是可以改变的
 (2)int *cosnt *q;修饰的是*q,所以**q和q是可以改变的
@@ -152,13 +148,11 @@ c++的语言规范：cosnt修饰的是离它最近的类型。
 6.const和指针的类型转换公式：
 int* <= const int*  是错误的！
 cosnt int* <=== int*  是正确的！
-
 int ** <= const int**  是错误的！
 cosnt int** <= int**  是错误的！
-
 int** <= int* const*  是错误的！
 int* cosnt* <= int**  是正确的！
-7.如果const右边没有接指针*d话，cosnt是不参与类型的
+7.如果const右边没有接指针*的话，cosnt是不参与类型的
 int* const p = &a;//int*<===int*  const后无指针*，不参与类型
 */
 int main()
@@ -193,12 +187,12 @@ int main()
 		*q = &b <=> p = &b;//即把常量b的地址赋给了一个普通指针p，
 	所以const int* *q=&p是错误的
 	*/
-	可以修改为：
+	//可以修改为：
 		int a = 0;
 	const int* p = &a;
 	const int** q = &p;
-	或者
-		int a = 0;
+	//或者
+	int a = 0;
 	int* p = &a;
 	const int* const* q = &p;
 	return 0;
@@ -253,12 +247,12 @@ int main()
 	cout << "a:" << a << "b:" << b << endl;
 	int array[5] = {};
 	int* p = array;
-	定义一个引用变量，来引用数组
+	//定义一个引用变量，来引用数组
 		int(&q)[5] = array;
 	cout << sizeof(array) << endl;
 	cout << sizeof(q) << endl;
 	cout << sizeof(p) << endl;
-	int a = 10;//a为左值。左值他有内存，有名字，值可以修改
+	int a = 10;//a为左值。左值有内存，有名字，值可以修改
 	int& b = a;
 	int& c = 20;//错误，20是右值：没内存，没名字
 	const int& c = 20;//常引用，引用右值时要加const，c不能修改
@@ -292,6 +286,8 @@ int main()
 ======》new和delete
 1.new和malloc的区别
 2.delete和free的区别
+malloc按字节开辟内存的；new开辟内存时需要指定类型  new int[10]
+所以malloc返回的都是void*  operator new —>int*
 new不仅可以做内存开辟，还可以做内存的初始化操作
 malloc开辟内存失败，是通过返回值和nullptr作比较；而new开辟内存失败是通过抛出bad_alloc类型的异常来判断
 malloc和free，都是c的库函数
@@ -301,21 +297,84 @@ int *p1=new int(20);//抛出异常的new
 int *p2=new (nothrow) int;//不抛出异常的new
 const int *p3=new cosnt int(40);//在堆上开辟一个常量空间并初始化为40
 int *p4=new(某地址) int(50);定位new
+4.实际上new和delete调用的是其运算符重载函数
+new ——> operator  new
+delete ——> operator delete
+5.new和delete能混用吗？C++为什么区分单个元素和数组的内存分配和释放呢？
+对于普通的编译器内置类型，new/delete[] new[]/delete可以混用，因为没有构造和析构的调用
+
+自定义的类类型，有析构函数，为了调用正确的析构函数，那么开辟对象数组的时候，会多开辟四个字节，记录对象的个数。
+
 */
+//先调用operator new开辟内存空间，然后调用对象的构造函数(初始化)
+void* operator new(size_t size)
+{
+	void* p = malloc(size);
+	if (p == nullptr)
+		throw bad_alloc();
+	cout << "operator new addr:" << p << endl;
+	return p;
+}
+//delete p;调用p指向对象的析构函数，再调用operator delete释放内存空间
+void operator delete(void* p)
+{
+	cout << "operator delete addr:" << p << endl;
+	free(p);
+}
+void* operator new[](size_t size)
+{
+	void* p = malloc(size);
+	if (p == nullptr)
+		throw bad_alloc();
+	cout << "operator new[] addr:" << p << endl;
+	return p;
+}
+//delete p;调用p指向对象的析构函数，再调用operator delete释放内存空间
+void operator delete[](void* p)
+{
+	cout << "operator delete[] addr:" << p << endl;
+	free(p);
+}
+class Test
+{
+public:
+	Test()
+	{
+		cout << "Test" << endl;
+	}
+	~Test()
+	{
+		cout << "~Test()" << endl;
+	}
+};
 int main()
 {
-	int* p = new int(20);//开辟变量
-	delete p;//释放
+	//int* p = new int(20);//开辟变量
+	//delete p;//释放
 
-	int* q1 = new int[20];//开辟一个大小为20整形数组，不做初始化
-	int* q2 = new int[20]();//辟一个大小为20整形数组,并将每一个元素初始化为0；
-	delete[]q1;//释放
-	delete[]q1;//释放
+	//int* q1 = new int[20];//开辟一个大小为20整形数组，不做初始化
+	//int* q2 = new int[20]();//辟一个大小为20整形数组,并将每一个元素初始化为0；
+	//delete[]q1;//释放
+	//delete[]q1;//释放
+	////定位new
+	//int data = 0;
+	//int* p4 = new(&data)int(50);
+	//cout << "data:" << data << endl;
 
-	//定位new
-	int data = 0;
-	int* p4 = new(&data)int(50);
-	cout << "data:" << data << endl;
+	//int* p = new int;
+	//delete p;
+	//int  *arr= new int[10];
+	//delete[]arr;
+
+	//Test* p1 = new Test();
+	//delete p1;
+	//delete[] p1;
+
+	//Test* p2 = new Test[5];
+	//cout << "p2 addr:" << p2 << endl;
+	//delete[]p2;
+	//delete p2;
 	return 0;     
 }
 #endif
+

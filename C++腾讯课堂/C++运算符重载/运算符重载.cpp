@@ -238,6 +238,7 @@ int main()
 
 迭代器的功能：
 提供一种统一的方式，来透明的遍历容器。
+可读可写的一种结构
 
 迭代器可以透明的访问容器内部的元素的值：
 我们无需关心容器底层中数据是以什么数据结构存储的，我们只需要关心这组数据的起始位置和结束位置，然后对迭代器进行递增访问即可
@@ -245,7 +246,7 @@ int main()
 迭代器多使用于泛型算法：
 1.泛型算法参数接收的都是迭代器!
 2.泛型算法是一组全局的函数，是给所有的容器用的!
-3.泛型算法，有一套方式，能够统一的遍历所有的容器的元素，我们所说的方法即迭代器。
+3.泛型算法，有一套方式，能够统一的遍历所有的容器的元素，我们所说的方式即迭代器。
 */
 class String
 {
@@ -371,7 +372,6 @@ int main()
 	cout << endl;
 	return 0;
 }
-#endif
 /*
 类模板 == 》实现一个C++  STL的一个顺序容器 vector向量容器 + 空间配置器 + 迭代器
 容器的空间配置器allocator：
@@ -500,8 +500,8 @@ public:
 	bool full()const { return _last == _end; }
 	bool empty()const { return _last == _first; }
 	int size()const { return _last - _first; }
-	T& operator[](int index) 
-	{ 
+	T& operator[](int index)
+	{
 		if (index < 0 || index >= size())
 			throw"OuutOfRangeException";
 		return _first[index];
@@ -515,8 +515,8 @@ public:
 		iterator(vector<T, Alloc>* pvec = nullptr
 			, T* ptr = nullptr)
 			:_ptr(ptr)
-			,_pVec(pvec)
-		{ 
+			, _pVec(pvec)
+		{
 			Iterator_Base* itb =
 				new Iterator_Base(this, _pVec->_head._next);
 			_pVec->head._next = itb;
@@ -527,7 +527,7 @@ public:
 			//检查迭代器的有效性
 			if (_pVec == nullptr || _pVec != it._pVec)
 			{
-				throw"iterotar incompatable!"; 
+				throw"iterotar incompatable!";
 			}
 			return _ptr != it._ptr;
 		}
@@ -535,14 +535,14 @@ public:
 		void operator++()
 		{
 			//检查迭代器的有效性
-			if (_pVec == nullptr )
+			if (_pVec == nullptr)
 			{
 				throw"iterotar incompatable!";
 			}
 			_ptr++;
 		}
 		//*解引用运算符重载
-		T& operator*() 
+		T& operator*()
 		{
 			//检查迭代器的有效性
 			if (_pVec == nullptr)
@@ -551,14 +551,14 @@ public:
 			}
 			return *_ptr;
 		}
-		const T& operator*()const 
+		const T& operator*()const
 		{
 			//检查迭代器的有效性
 			if (_pVec == nullptr)
 			{
 				throw"iterotar incompatable!";
 			}
-			return *_ptr; 
+			return *_ptr;
 		}
 	private:
 		T* _ptr;
@@ -575,7 +575,7 @@ public:
 		Iterator_Base* it = this->_head.next;
 		while (it != nullptr)
 		{
-			if (it->_cur->_ptr >= first&& it->_cur->_ptr <= last)
+			if (it->_cur->_ptr >= first && it->_cur->_ptr <= last)
 			{
 				//迭代器失效，把iterator持有的容器指针置nullptr
 				it->_next->_pVec = nullptr;
@@ -590,6 +590,25 @@ public:
 				it = it->_next;
 			}
 		}
+	}
+	//自定义vector容器insert方法的实现
+	iterator insert(iterator it, const T& v)
+	{
+		/*
+		1.不考虑扩容
+		2.不考虑it._ptr的合法性
+		*/
+		verify(it._ptr - 1, _last);
+		T* p = _last;
+		while (p > it._ptr)
+		{
+			_allocator.construct(p, *(p - 1));
+			_allocator.destory(p - 1);
+			p--;
+		}
+		_allocator.construct(p, val);
+		_last++;
+		return iterator(this, p);
 	}
 private:
 	T* _first;//指向数组起始的位置
@@ -658,7 +677,6 @@ int main()
 	return 0;
 }
 
-#if 0
 /*
 ======》迭代器的失效问题:使用库中的迭代器来引出问题所在
 1.迭代器为什么会失效？
@@ -739,3 +757,101 @@ int main()
 	return 0;
 }
 #endif
+/*
+内存池 进程池 线程池 连接池 对象池
+=======》new、delete重载实现的对象池应用
+
+
+*/
+template<typename T>
+class Queue
+{
+public:
+	Queue()
+	{
+		_front = _rear = new QueueItem();
+	}
+	~Queue()
+	{
+		QueueItem* cur = _front;
+		while (cur != nullptr)
+		{
+			_front = _front->_next;
+			delete cur;
+			cur = _front;
+		}
+	}
+	void push(const T& val)
+	{
+		QueueItem* item = new QueueItem(val);
+		_rear->_next = item;
+		_rear = item;
+	}
+	void pop()
+	{
+		if (empty())
+			return;
+		QueueItem* first = _front->_next;
+		_front->_next = first->_next;
+		if (_front->_next == nullptr)
+			_rear = _front;
+		delete first;
+	}
+	T front()const
+	{
+		return _front->_next->_data;
+	}
+	bool empty()const { return _rear == _front; }
+private: 
+	//产生一个QueueItem的对象池(n个QueueItem结点）
+	struct QueueItem
+	{
+		QueueItem(T data = T())
+			:_data(data)
+			, _next(nullptr)
+		{ }
+		//给QueueItem提供自定义内存管理
+		void* operator new(size_t size)
+		{
+			if (_itemPool == nullptr)
+			{
+				_itemPool = (QueueItem*)new char[POOL_ITEM_SIZE * sizeof(QueueItem)];
+				QueueItem * p = _itemPool;
+				for (; p < _itemPool + POOL_ITEM_SIZE1 - 1; ++p)
+				{
+					p->_next = p + 1;
+
+				}
+				p->_next = nullptr;
+			}
+			QueueItem* p = _itemPool;
+			_itemPool = _itemPool->_next;
+			return p;
+		}
+		void operator delete(void* ptr)
+		{
+			QueueItem* p = (QueueItem*)ptr;
+			p->_next = _itemPool;
+			_itemPool = p;
+		}
+		T _data;
+		QueueItem* _next;
+		static QueueItem* _itemPool;
+		static const int POOL_ITEM_SIZE = 100000;
+	};
+	QueueItem* _front;//指向队头结点
+	QueueItem* _rear;//指向队尾结点
+};
+template<typename T>
+typename Queue<T>::QueueItem* Queue<T>::QueueItem::_itemPool = nullptr;
+int main()
+{
+	Queue<int>que;
+	for (int i = 0; i < 100000; ++i)
+	{
+		que.push(i);
+		que.pop();
+	}
+	cout << que.empty() << endl;
+	return 0;
+}
