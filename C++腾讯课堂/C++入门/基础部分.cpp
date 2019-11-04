@@ -281,7 +281,7 @@ int main()
 	return 0;
 }
 
-
+#endif
 /*
 ======》new和delete
 1.new和malloc的区别
@@ -370,11 +370,11 @@ int main()
 	//delete p1;
 	//delete[] p1;
 
-	//Test* p2 = new Test[5];
-	//cout << "p2 addr:" << p2 << endl;
-	//delete[]p2;
+	Test* p2 = new Test[5];
+	cout << "p2 addr:" << p2 << endl;
+	delete[]p2;
 	//delete p2;
 	return 0;     
 }
-#endif
+
 

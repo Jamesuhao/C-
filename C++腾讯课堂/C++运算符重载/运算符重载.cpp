@@ -124,7 +124,7 @@ string类
 
 */
 #include<string>
-//模式实现String类
+//模拟实现String类
 class String
 {
 public:
@@ -756,7 +756,7 @@ int main()
 	cout << endl;
 	return 0;
 }
-#endif
+
 /*
 内存池 进程池 线程池 连接池 对象池
 =======》new、delete重载实现的对象池应用
@@ -855,3 +855,5 @@ int main()
 	cout << que.empty() << endl;
 	return 0;
 }
+#endif
+#include<math.h>
