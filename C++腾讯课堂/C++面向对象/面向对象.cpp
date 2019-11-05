@@ -572,24 +572,23 @@ int main()
 	return 0;
 }
 
-
-
 /*
 ======>类的各种成员--->成员方法/变量
 普通成员方法：=======>编译器会添加一个this形参变量
 1.属于类的作用域
-2.调用该方法时，需要依赖一个对象(常对象是无法调用的 实参：cosnt CGoods*   形参：CGoods *this
+2.调用该方法时，需要依赖一个对象(常对象是无法调用的 实参：cosnt 类名*this   形参：类名 *this
 3.可以任意访问对象的私有成员变量
-
+4.带有一个隐含的参数：this指针
 static静态成员方法：=====>不会生成this形参,修饰所有对象共享的信息
 1.属于类的作用域
 2.用类名作用域来调方法
 3.可以任意访问对象的私有成员，仅限于不依赖对象的成员(只能调用其他的static静态成员)
-
+4.属于类级别的，计算对象大小时不计算static成员变量
 const常成员方法：=======>const CGoods* this
 1.属于类的作用域
-2.调用依赖于一个对象，普通对象或者对象都可以
-3.可以任意访问对象的私有成员，但只能读，不能写
+2.调用依赖于一个对象，普通对象或者对象都可以。
+3.可以任意访问对象的私有成员，但只能读，不能写。
+4.只要是只读操作的成员方法，建议一律实现成const常成员方法。
 */
 class CDate
 {
@@ -600,7 +599,7 @@ public:
 		_month = m;
 		_day = d;
 	}
-
+	//常成员方法：
 	void show()const
 	{
 		cout << _year << "/" << _month << "/" << _day << endl;
@@ -616,13 +615,14 @@ public:
 	CGoods(const char* n, int a, double p, int y, int m, int d)
 		:_date(y, m, d)
 		, _amount(a)
-		, _price(p)
+		, _price(p)      // #1 构造函数的初始化列表
 	{
+		//  #2 当前类类型构造函数体
 		strcpy(_name, n);
-		_count++;
+		_count++;//记录所有产生的新对象的数量
 	}
 	//普通的成员方法
-	void show()//打印商品的私有信息
+	void show()//打印商品的私有信息  隐含的参数：CGoods *this
 	{
 		cout << "name:" << _name << endl;
 		cout << "amount:" << _amount << endl;
@@ -648,8 +648,8 @@ private:
 	char _name[20];
 	int _amount;
 	double _price;
-	CDate _date;
-	//static定义的变量不属于对象,而是属于类级别的
+	CDate _date; //成员对象  1.分配内存  2.调用构造函数
+	//static定义的变量不属于对象,而是属于类级别的，属于所有对象共享的
 	static int _count;//声明，用来记录商品对象的总数量
 };
 //static成员变量一定要在类外进行定义并初始化
@@ -664,19 +664,15 @@ int main()
 
 	CGoods good3("商品3", 100, 35.0, 2019, 5, 12);
 	good3.show();
-
 	CGoods good4("商品4", 100, 35.0, 2019, 5, 12);
 	good4.show();
-
 	//统计所有商品的总数量
 	CGoods::showCGoodCount();
 
 	const CGoods good5("非卖商品5", 100, 35.0, 2019, 5, 12);
 	good5.show();//CGoods::show(&good5)  const CGoods*   -->const CGoods  *this
-
 	return 0;
 }
-
 
 /*
 ========》指向类成员(成员变量和成员方法)的指针
