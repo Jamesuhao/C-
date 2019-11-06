@@ -1,0 +1,7 @@
+﻿  模板.cpp
+D:\C++\代码\C++腾讯课堂\C++模板\模板.cpp(535,14): warning C4244: “参数”: 从“double”转换到“const T”，可能丢失数据
+D:\C++\代码\C++腾讯课堂\C++模板\模板.cpp(535,14): warning C4244:         with
+D:\C++\代码\C++腾讯课堂\C++模板\模板.cpp(535,14): warning C4244:         [
+D:\C++\代码\C++腾讯课堂\C++模板\模板.cpp(535,14): warning C4244:             T=int
+D:\C++\代码\C++腾讯课堂\C++模板\模板.cpp(535,14): warning C4244:         ]
+  C++模板.vcxproj -> D:\C++\代码\C++腾讯课堂\C++入门\Debug\C++模板.exe
