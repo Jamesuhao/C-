@@ -44,10 +44,10 @@ using namespace std;
 #include<unordered_set>
 #include<unordered_map>
 #include<string>
+
 //1.顺序容器：
 #if 0
 /*
-
 list:链表容器
 底层数据结构：双向循环链表 pre data next
 list<int>mylist;
@@ -413,7 +413,6 @@ public:
 private:
 	Container con;
 };
-
 stack：push入栈     pop出栈    top查看栈顶元素     empty判断栈空     size
 queue：push入队   pop出队     front查看队头元素   back查看队尾元素 empty判断队空 size返回队列元素的个数
 stack => deque   为什么不依赖vector?
@@ -482,7 +481,7 @@ int main()
 #if 0
 /*
 无序关联容器
-1.各个容器底层的数据结构  链式哈希表O(1)    红黑树O(log2n)
+1.各个容器底层的数据结构  链式哈希表O(1)   
 2.常用增删查方法:
 增加：insert(val)
 遍历：iterator自己搜索，调用find成员方法
@@ -583,7 +582,6 @@ int main()
 	{
 		arr[i] = rand() % 20+ 1;
 	}
-
 	//查重：
 	//上面的10万个整数中统计哪些数字重复了，并且统计数字重复的次数
 	unordered_map<int, int>map1;
@@ -632,4 +630,269 @@ int main()
 	cout << endl;
 	return 0;
 }
+/*
+有序关联容器
+底层数据结构： 红黑树O(log2n)
+在对于自定义类型使用set时，需要提供"<"运算符重载函数
+而在使用map表时，则不用提供"<"运算符重载函数，它是用key值来排序的
+*/
+class Student
+{
+public:
+
+	Student(int id = 0, string name = "")
+		:_id(id)
+		,_name(name)
+	{ }
+	//bool operator<(const Student& stu)const
+	//{
+	//	return _id < stu._id;
+	//}
+	friend ostream& operator<<(ostream& out, const Student& stu);
+private:
+	int _id;
+	string _name;
+};
+ostream& operator<<(ostream& out, const Student& stu)
+{
+	out << "id:" << stu._id << " name:" << stu._name << endl;
+	return out;
+}
+int main()
+{
+	/*
+	set<int>set1;
+	for (int i = 0; i < 20; ++i)
+	{
+		set1.insert(rand() % 20 + 1);
+	}
+	for (int v : set1)
+	{
+		cout << v << " ";
+	}
+	cout << endl;
+	
+	multiset<Student>set1;
+	set1.insert(Student(1020, "张雯"));
+	set1.insert(Student(1000, "李广"));
+	set1.insert(Student(1020, "张雯"));
+	for (auto it = set1.begin(); it != set1.end(); ++it)
+	{
+		cout << *it << endl;
+	}
+	*/
+	map<int, Student>stuMap;
+	stuMap.insert({ 1000,Student(1000,"张雯") });
+	stuMap.insert({ 1020,Student(1020,"李广") });
+	stuMap.insert({ 1030,Student(1030,"高洋") });
+
+	//删除：stuMap.erase(it)  stuMap.erase(1020)
+	//查询：
+	//stuMap[key]
+	cout << stuMap[1020] << endl;
+	auto it = stuMap.find(1030);
+	cout << "key:" << it->first << " value:" << it->second << endl;
+	//迭代器：
+	for (auto it = stuMap.begin(); it != stuMap.end(); ++it)
+	{
+		cout << "key:" << it->first << " value:" << it->second << endl;
+	}
+	return 0;
+}
 #endif
+
+//4.容器的迭代器iterator
+#if 0
+/*
+====》常量正向迭代器：const_iterator
+只能读不能写
+const_iterator                           <=                   iterator
+		|                                                                      |
+class const iterator{};基类          <=               class itreator:public const_iterator{};派生类
+class const_iterator
+{
+public:
+	const T& operator*(){ return *_ptr ; }
+};
+class iterator
+{
+public:
+	T& operator*(){ return *_ptr ; }
+};
+====》普通正向迭代器：iterator
+可读可写
+====》常量反向迭代器：const_reverse_iterator
+与常量正向迭代器同理
+====》普通反向迭代器  reverse_iterator
+可读可写
+*/
+int main()
+{
+	//正向迭代器
+	vector<int>vec;
+	for (int i = 0; i < 20; ++i)
+	{
+		vec.push_back(rand() % 100);
+	}
+	//标准写法：
+	//vector<int>::iterator it1 = vec.begin();
+	//简写法： 
+	//auto it1 = vec.begin();  //可读可写的正向迭代器
+	vector<int>::const_iterator it1 = vec.begin();//只读迭代器
+	for (; it1 != vec.end(); ++it1)
+	{
+		cout << *it1 << " ";
+		//if (*it1 % 2 == 0)
+		//{
+		//	*it1 = 0;
+		//}
+	}
+	cout << endl;
+	for (int v : vec)
+	{
+		cout << v << " ";
+	}
+	cout << endl;
+	//反向迭代器
+	//rbegin():返回的时最后一个元素的反向迭代器表示
+	//rend():返回的是首元素前驱位置的迭代器的表示
+	//普通反向迭代器：可读可写
+	//标准写法：
+	//vector<int>::reverse_iterator rit = vec.rbegin();
+	//简写：
+	//auto rit = vec.rbegin();
+	//常量反向迭代器
+	vector<int>::const_reverse_iterator rit = vec.rbegin();
+	for (; rit != vec.rend(); ++rit)
+	{
+		cout << *rit << " ";
+		//if (*rit % 2 == 0)
+		//{
+		//	*rit = 0;
+		//}
+	}
+	cout << endl;
+	for (int v : vec)
+	{
+		cout << v << " ";
+	}
+	cout << endl;
+	cout << endl;
+	return 0;
+}
+#endif
+
+//5.函数对象
+#if 0
+/*
+拥有（）小括号运算符重载函数的对象，称作函数对象或者仿函数
+即就是C语言里面的函数指针。
+小括号运算符重载函数中，参数有两个，叫做二元函数对象，参数有1个，叫做一元函数对象。
+函数对象的好处：
+1.通过函数对象调用operator()，可以省略函数的调用，比通过函数指针调用函数(不能inline内联调用)效率高
+2.因为函数对象是用类生成的，所以可以添加相关的成员变量，用来记录对象使用时更多的信息。
+
+问题：如何解决比较时需求改变的问题？
+使用C语言函数指针解决方案：
+template<typename T>
+bool mygreater(T a, T b)
+{
+	return a > b;
+}
+template<typename T>
+bool myless(T a, T b)
+{
+	return a < b;
+}
+*/
+//使用C++函数对象解决方案：
+template<typename T>
+class mygreater
+{
+public:
+	bool operator()(T a, T b)
+	{
+		return a > b;
+	}
+};
+template<typename T>
+class myless
+{
+public:
+	bool operator()(T a, T b)
+	{
+		return a < b;
+	}
+};
+//compare是C++的库函数模板
+template<typename T, typename Compare>
+bool compare(T a, T b,Compare comp)
+{
+	//通过函数指针调用函数，是没有办法内敛的，效率很低，因为有函数调用开销
+	return comp(a,b);//
+}
+int main()
+{
+	//cout << compare(10, 20, mygreater<int>) << endl;
+	//cout << compare(10, 20, myless<int>) << endl;
+	cout << compare(10, 20,mygreater<int>()) << endl;
+	cout << compare(10, 20, myless<int>()) << endl;
+	return 0;
+}
+//使用函数对象的示例1：
+int main()
+{
+	priority_queue<int>que;//vector
+	for (int i = 0; i < 10; ++i)
+	{
+		que.push(rand() % 100);
+	}
+	while (!que.empty())
+	{
+		cout << que.top() << " ";
+		que.pop();
+	}
+	cout << endl;
+
+	priority_queue<int, vector<int>, greater<int>>que1;
+	for (int i = 0; i < 10; ++i)
+	{
+		que1.push(rand() % 100);
+	}
+	while (!que1.empty())
+	{
+		cout << que1.top() << " ";
+		que1.pop();
+	}
+	cout << endl;
+	return 0;
+}
+//使用函数对象的示例2：
+int main()
+{
+	multiset<int>set1;
+	for (int i = 0; i < 10; ++i)
+	{
+		set1.insert(rand() % 100 );
+	}
+	for (int v : set1)
+	{
+		cout << v << " ";
+	}
+	cout << endl;
+
+	multiset<int, greater<int>>set2;
+	for (int i = 0; i < 10; ++i)
+	{
+		set2.insert(rand() % 100);
+	}
+	for (int v : set2)
+	{
+		cout << v << " ";
+	}
+	cout << endl;
+	return 0;
+}
+#endif
+
+//6.泛型算法和

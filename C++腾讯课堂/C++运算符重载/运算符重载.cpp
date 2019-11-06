@@ -153,6 +153,13 @@ public:
 		_pstr = new char[strlen(str._pstr) + 1];
 		strcpy(_pstr, str._pstr);
 	}
+	//现代写法：
+	String(const String& str)
+		:_str(nullptr)
+	{
+		string tmp(str._str);
+		swap(_str, str._str);
+	}
 	String& operator=(const String& str)
 	{
 		if (this == &str)
@@ -160,6 +167,12 @@ public:
 		delete[]_pstr;
 		_pstr = new char[strlen(str._pstr) + 1];
 		strcpy(_pstr, str._pstr);
+		return *this;
+	}
+	//现代写法
+	String& operator=(const String& str)
+	{
+		swap(_str, str._str);
 		return *this;
 	}
 	bool operator>(const String& str)const
@@ -228,7 +241,7 @@ int main()
 	//cout << a3 << endl;
 	return 0;
 }
-
+#endif
 
 /*
 ======》字符串对象的迭代器iterator实现:是容器的一种嵌套使用
@@ -251,19 +264,10 @@ int main()
 class String
 {
 public:
-	String(const char* p = nullptr)
+	String(const char* str = "")
+		:_pstr(new char[strlen(str) + 1])
 	{
-		cout << "String()" << endl;
-		if (p != nullptr)
-		{
-			_pstr = new char[strlen(p) + 1];
-			strcpy(_pstr, p);
-		}
-		else
-		{
-			_pstr = new char[1];
-			*_pstr = '\0';
-		}
+		strcpy(_pstr, str);
 	}
 	~String()
 	{
@@ -276,15 +280,29 @@ public:
 		_pstr = new char[strlen(str._pstr) + 1];
 		strcpy(_pstr, str._pstr);
 	}
+	//现代写法：
+	//String(const String& str)
+	//	:_str(nullptr)
+	//{
+	//	string tmp(str._str);
+	//	swap(_str, str._str);
+	//}
 	String& operator=(const String& str)
 	{
-		if (this == &str)
-			return*this;
-		delete[]_pstr;
-		_pstr = new char[strlen(str._pstr) + 1];
-		strcpy(_pstr, str._pstr);
+		if (this != &str)
+		{
+			delete[]_pstr;
+			_pstr = new char[strlen(str._pstr) + 1];
+			strcpy(_pstr, str._pstr);
+		}
 		return *this;
 	}
+	//现代写法
+	//String& operator=(const String& str)
+	//{
+	//	swap(_str, str._str);
+	//	return *this;
+	//}
 	bool operator>(const String& str)const
 	{
 		return strcmp(_pstr, str._pstr) > 0;
@@ -372,6 +390,7 @@ int main()
 	cout << endl;
 	return 0;
 }
+#if 0
 /*
 类模板 == 》实现一个C++  STL的一个顺序容器 vector向量容器 + 空间配置器 + 迭代器
 容器的空间配置器allocator：
