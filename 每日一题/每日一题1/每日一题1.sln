@@ -7,7 +7,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "每日一题1", "每日一�
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "每日一题2", "..\每日一题2\每日一题2.vcxproj", "{E2633A7C-6CEA-436B-8C57-C97C805A587D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "每日一题3", "每日一题3\每日一题3.vcxproj", "{DEBB3AF8-6D5B-4609-9419-49DCB3A79047}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "每日一题3", "..\每日一题3\每日一题3.vcxproj", "{DEBB3AF8-6D5B-4609-9419-49DCB3A79047}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
