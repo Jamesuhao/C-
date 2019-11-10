@@ -1,4 +1,7 @@
+#if 0
 #include <iostream>
+#include <mutex>
+#include <thread>
 using namespace std;
 
 /*
@@ -7,7 +10,7 @@ using namespace std;
 2.提供一个公有的static接口创建对象
 3.防拷贝：只声明拷贝构造不实现
 */
-#if 0
+
 class HeapOnly
 {
 public:
@@ -75,6 +78,7 @@ int main()
 2.提供一个静态的公有接口返回对象
 3.要定义一个static指针
 4.防拷贝：只声明拷贝构造不实现
+5.线程安全：双检查
 */
 //饿汉模式
 //class Singleton
@@ -107,8 +111,13 @@ class Singleton
 public:
 	static Singleton* getInstance()
 	{
-		if(_pInstance==nullptr)
-			_pInstance = new Singleton;
+		if (_pInstance == nullptr)
+		{
+			_mtx.lock();
+			if (_pInstance == nullptr)
+				_pInstance = new Singleton;
+			_mtx.unlock();
+		}
 		return _pInstance;
 	}
 private:
@@ -118,8 +127,10 @@ private:
 	}
 	Singleton(const Singleton& h);
 	static Singleton* _pInstance;
+	static mutex _mtx;
 };
 Singleton* Singleton::_pInstance = nullptr;
+mutex Singleton::_mtx;
 int main()
 {
 	Singleton* ps = Singleton::getInstance();
@@ -127,4 +138,3 @@ int main()
 	return 0;
 }
 #endif
-
