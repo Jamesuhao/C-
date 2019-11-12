@@ -62,6 +62,7 @@ int main()
 #include <algorithm>
 #include<vector>
 using namespace std;
+//方法一：利用快排
 class Solution {
 public:
 	int MoreThanHalfNum_Solution(vector<int> numbers)
@@ -95,18 +96,34 @@ public:
 		}
 	}
 };
-int main()
-{
-	Solution sou;
-	vector<int>vec;
-	for (int i = 0; i < 1; i++)
+//方法二：保存出现次数最多的元素
+class Solution {
+public:
+	int MoreThanHalfNum_Solution(vector<int> numbers)
 	{
-		int a = 0;
-		cin >> a;
-		 vec.push_back(a);
+		int result = numbers[0];
+		int times = 1;
+		for (int i = 0; i < numbers.size(); ++i)
+		{
+			if (times == 0)
+			{
+				result = numbers[i];
+				times = 1;
+			}
+			else if (result == numbers[i])
+				++times;
+			else
+				--times;
+		}
+		times = 0;
+		for (int i = 0; i < numbers.size(); ++i)
+		{
+			if (numbers[i] == result)
+				++times;
+		}
+		return (result > numbers.size() / 2) ? result : 0;
 	}
-	cout << sou.MoreThanHalfNum_Solution(vec) << endl;
-}
+}；
 #endif
 
 //#3在字符串中找出连续最长的数字串
