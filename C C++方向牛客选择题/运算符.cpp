@@ -11,5 +11,12 @@ void main()
 }
 注解：关系运算符具有左结合性
 
-#2
+#2以下哪个选项一定可以将flag的第二个bit置0(A)
+A flag &= ~2
+B flag |= 2
+C flag ^= 2
+D flag >>= 2
+
+#3
+
 #endif 
