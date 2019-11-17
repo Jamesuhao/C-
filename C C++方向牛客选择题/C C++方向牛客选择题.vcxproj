@@ -123,11 +123,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="函数.cpp" />
     <ClCompile Include="字符串.cpp" />
     <ClCompile Include="指针.cpp" />
     <ClCompile Include="数据类型.cpp" />
     <ClCompile Include="数组.cpp" />
     <ClCompile Include="结构体.cpp" />
+    <ClCompile Include="虚函数.cpp" />
     <ClCompile Include="运算符.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

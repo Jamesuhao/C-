@@ -8,8 +8,27 @@ char* str1 = "Hello", str2[] = "Hello"; ，
           str2为一个子符数组，sizeof求字符串长度时包含'\0'。
 
 #2
-
-
+以下程序的运行结果是（B）
+int main(void)
+{
+	printf("%s , %5.3s\n", "computer", "computer");
+	return 0;
+}
+A computer, puter
+B computer, com
+C computer, computer
+D computer, compu.ter
+注解：
+% m.ns 输出占m列，但只取字符串中左端n个字符。这n个字符输出在m列的右侧，左补空格。
+%ms输出占m列，如果字符串长度比设定长度大就按字符串实际长度输出
+                           如果字符串长度比设定长度小就按右对齐输出字符串，左端补0
 #3
 
 #endif
+#include<iostream>
+using namespace std;
+
+int main()
+{
+
+}
