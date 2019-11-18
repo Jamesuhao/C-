@@ -19,5 +19,41 @@ struct A {
 注解：
 此为位段，a、b共占31个bit位，所以a和b共占4个字节；
 b、c之和大于32个bit位，所以b和c各占4个字节，index为char类型，1字节对齐，占一个字节；
-整体4字节对齐，攻占16个字节
+整体4字节对齐，共占16个字节
+
+#3下面两个结构体，在#pragma pack(4)和#pragma pack(8)的情况下，结构体的大小分别是(16,16,16,24)
+struct One {
+	double d;
+	char c;
+	int i;
+}
+struct Two {
+	char c;
+	double d;
+	int i;
+注解：
+#pragma pack(4):
+One   0~7 8 12~15     8字节对齐   共16个字节
+Two   1 4~11 12~15   8字节对齐   共16个字节
+#pragma pack(8)
+One   0~7 8 12~15     8字节对齐  共16个字节
+Two   1 8~15 16~19   8字节对齐  共24个字节
+
+#4有一个如下结构体，请问在64位编译器下用sizeof(struct A)计算出的大小是多少？(24)
+struct A {
+	long a1;
+	short a2;
+	int a3;
+	int* a4;
+};
+注解：
+64位编译器：
+指针：8个字节
+long：8个字节
+unsigned long：8个字节
+32位编译器下：
+指针：4个字节
+long：4个字节
+unsigned long：4个字节
+a1:0~7 a2:8~11 a3:12~15 a4:16~19 8字节对齐：共占24个字节
 #endif

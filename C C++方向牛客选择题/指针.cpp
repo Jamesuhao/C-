@@ -25,5 +25,27 @@ B 子类指针不可以指向父类实例
 C 任何引用都必须指向一个实例
 D 引用所指向的实例不可能无效
 
+#4下面关于"指针"的描述不正确的是(A)
+A 当使用free释放掉一个指针内容后, 指针变量的值被置为NULL   //free只负责释放空间
+B 32位系统下任何类型指针的长度都是4个字节
+C 指针的数据类型声明的是指针实际指向内容的数据类型
+D 野指针是指向未分配或者已经释放的内存地址
 
+#5以下程序的输出结果为(A)
+#include <iostream>
+using namespace std;
+void func(char** m) {
+	++m;
+	cout << *m << endl;
+}
+int main() {
+	static char* a[] = { "morning", "afternoon", "evening" };
+	char** p;
+	p = a;
+	func(p);
+	return 0;
+A afternoon
+B 字符o的起始地址
+C 字符o
+D 字符a的起始地址
 #endif
