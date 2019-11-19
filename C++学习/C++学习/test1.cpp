@@ -17,6 +17,7 @@ char* Strstr(char* dest, char* src)
 			{
 				if (*mdest != *msrc)
 					break;
+				mdest++;
 				msrc++;
 			}
 			if (*msrc == '\0')
