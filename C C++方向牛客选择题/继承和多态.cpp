@@ -148,4 +148,10 @@ C 0 1 2
 D 2 1 0
 E 不可预期
 F 以上都不对
+
+#8在C++，下列哪一个可以做为对象继承之间的转换(C)???
+A static_cast
+B reinterpret_cast
+C dynamic_cast
+D const_cas
 #endif

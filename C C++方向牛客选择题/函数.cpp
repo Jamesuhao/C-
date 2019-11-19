@@ -44,5 +44,28 @@ D 9
 注解：a(4),      1次
 		  b(5),      1次
 		  c[3],      3次
-		  *p[]2,    0次
+		  *p[2],    0次
+因为*p[2]是一个指针数组，里面存储的是指针，不是对象，所以不调用构造函数。
+
+#7下面的输出可能是什么？(C)
+class Printer {
+public:
+	Printer(std::string name) { std::cout << name; }
+};
+class Container {
+public:
+	Container() : b("b"), a("a") {}
+	Printer a;
+	Printer b;
+};
+int main() {
+	Container c;
+	return 0;
+}
+A 可能是 "ab" 或 "ba"。 依赖于具体的实现
+B 一直都是 "ba"
+C 一直都是 "ab"
+注解：
+成员变量初始化顺序与其构造函数初始化列表中的顺序无关，是按照其在类中声明的顺序进行初始化的，所以先初始化Printer a，在初始化
+Printer b;
 #endif

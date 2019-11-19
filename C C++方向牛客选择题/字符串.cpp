@@ -37,10 +37,17 @@ D xycdBCD
 E 运行出错
 注解：
 strcat函数的功能是从第二个参数所指向的字符串位置开始拼接到第一个参数所指向的字符串的位置处，并返回第一个参数所指向的字符串的位置。
-#endif
-#include<iostream>
-using namespace std;
 
-int main()
-{
-}
+#4执行下面语句后的输出为(A)
+int I = 1;
+if (I <= 0)
+printf("****\n");
+else
+printf("%%%%\n");
+A % %
+B ****
+C 有语法错，不能正确执行
+D %%%%
+注解：
+%是一个转义字符，%%相当于一个%，与/同理。
+#endif

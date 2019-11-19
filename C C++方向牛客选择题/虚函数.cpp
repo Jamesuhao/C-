@@ -54,4 +54,24 @@ int main()
 	cout << "b = " << obj.getB() << endl;
 	return 0;
 }
+
+#6有如下C++代码：？？？
+struct A {
+	void foo() { printf("foo"); }
+	virtual void bar() { printf("bar"); }
+	A() { bar(); }
+};
+struct B :A {
+	void foo() { printf("b_foo"); }
+	void bar() { printf("b_bar"); }
+};
+那么：
+A* p = new B;
+p->foo();
+p->bar();
+输出为：A
+A barfoob_bar
+B foobarb_bar
+C barfoob_foo
+D foobarb_fpp
 #endif
