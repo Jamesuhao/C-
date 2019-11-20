@@ -138,3 +138,110 @@ int main()
 	return 0;
 }
 #endif
+
+
+//#include<iostream>
+//#include<stack>
+//using namespace std;
+//struct TreeNode
+//{
+//	int val;
+//	TreeNode* left;
+//	TreeNode* right;
+//	TreeNode(int x)
+//		:val(x)
+//		, left(nullptr)
+//		, right(nullptr)
+//	{ }
+//};
+//class Solution
+//{
+//	TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
+//	{
+//		if (p->val == q->val)
+//			return p;
+//		stack<int>s1;
+//		stack<int>s2;
+//		TreeNode* Left = root;
+//		TreeNode* Right = root;
+//		while (Left != nullptr)
+//		{
+//			if (Left->left && Left->val != p->val)
+//			{
+//				s1.push(Left->val);
+//				Left = Left->left;
+//			}
+//		}
+//		while (Right != nullptr)
+//		{
+//
+//		}
+//	}
+//};
+//
+//class Solution {
+//public:
+//	TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+//		stack<TreeNode*> s, temp;
+//		TreeNode* cur = root, * last = NULL;
+//		while (cur || !s.empty())
+//		{
+//			if (cur)
+//			{
+//				s.push(cur);
+//				cur = cur->left;
+//			}
+//			else
+//			{
+//				cur = s.top();
+//				if (cur->right && cur->right != last)
+//				{
+//					cur = cur->right;
+//					s.push(cur);
+//					cur = cur->left;
+//				}
+//				else
+//				{
+//					if (temp.empty() && (cur == p || cur == q))
+//						temp = s;
+//					else if (!temp.empty() && (cur == p || cur == q)) break;
+//					s.pop();
+//					last = cur;
+//					cur = NULL;
+//				}
+//			}
+//		}
+//		int temp_len = temp.size();
+//		int s_len = s.size();
+//		if (temp_len > s_len)
+//		{
+//			int i = temp_len - s_len;
+//			while (i) { temp.pop(); i--; };
+//			while (s_len)
+//			{
+//				if (temp.top() == s.top()) return temp.top();
+//				else
+//				{
+//					temp.pop();
+//							s.pop();
+//						}
+//					}
+//				}
+//				else
+//				{
+//					int i = s_len - temp_len;
+//					while (i) { s.pop(); i--; };
+//					while (temp_len)
+//					{
+//						if (temp.top() == s.top()) return temp.top();
+//						else
+//						{
+//							temp.pop();
+//							s.pop();
+//						}
+//					}
+//				}
+//				return NULL;
+//			}
+//		};
+

@@ -1,3 +1,4 @@
+#if 0
 #define _CRT_SECURE_NO_WARNINGS
 #include<iostream>
 #include<string>
@@ -281,3 +282,4 @@ int main()
 	String str1 = "abcd\0\0end";
 	cout << str1 << endl;
 }
+#endif
