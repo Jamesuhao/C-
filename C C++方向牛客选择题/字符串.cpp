@@ -1,5 +1,4 @@
 #if 0
-
 #1
 在 32 位编译器上，设有定义
 char* str1 = "Hello", str2[] = "Hello"; ，
@@ -50,4 +49,35 @@ C 有语法错，不能正确执行
 D %%%%
 注解：
 %是一个转义字符，%%相当于一个%，与/同理。
+
+#5以下程序的输出结果为：D
+#include <iostream.h>
+void main()
+{
+	int x = 3, y = 3;
+	switch (x % 2) 
+	{
+	case 1:
+		switch (y)
+		{
+		case 0:cout << "first";
+		case 1:cout << "second"; break;
+		default: cout << "hello";
+		}
+	case 2:cout << "third";
+	}
+}
+A second third
+B hello
+C first second
+D hellothird
+注解：
+1.default在switch开头：
+（1）若所有case都不满足条件，则执行default，并执行default语句之后的case语句，直到break或结束，
+（2）若有case满足，则执行满足case以及case后的所有case以及default,直到break结束。
+2.default在switch中间：若所有case都不满足条件，同上，直接执行default语句，并执行default语句之后的case语句，直到break或结束 
+3.default在switch末尾：若所有case语句都不满足条件，则执行default语句，结束；若有case满足，则执行case语句直到遇到break或switch语句结束
+
 #endif
+
+

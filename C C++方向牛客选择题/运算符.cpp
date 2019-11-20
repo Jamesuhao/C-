@@ -33,4 +33,10 @@ C 10
 D 12
 注解：
 该数中二进制1的个数即为按位与的次数
+
+#4下列哪个用法哪个是错误的(C)
+A int* a;
+B extern const int array[256];  //extern引用外部变量
+C const int& ra;//引用变量必须赋初值
+D typedef void (*FUN)();
 #endif 

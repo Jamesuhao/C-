@@ -68,4 +68,64 @@ C 一直都是 "ab"
 注解：
 成员变量初始化顺序与其构造函数初始化列表中的顺序无关，是按照其在类中声明的顺序进行初始化的，所以先初始化Printer a，在初始化
 Printer b;
+
+#8以下函数中，和其他函数不属于一类的是(C)
+A fwrite:       将数据块写入流
+B putc:         将字符写入流
+C pwrite:      与ios对象关联的单词表的索引。
+D putchar:   输出字符
+E getline:     输入字符串
+F scanf:        输入格式化数据
+
+#9下列代码试图打印数字1 - 9的全排列组合, 其中run函数中缺失的部分应该依次为：C  ？？？
+#include "stdio.h"
+#define N 9
+int x[N];
+int count = 0;
+void dump() {
+	int i = 0;
+	for (i = 0; i < N; i++) {
+		printf("%d", x[i]);
+	}
+	printf("\n");
+}
+void swap(int a, int b) {
+	int t = x[a];
+	x[a] = x[b];
+	x[b] = t;
+}
+void run(int n) {
+	int i;
+	if (N - 1 == n) {
+		dump();
+		count++;
+		return;
+	}
+	for (i = ___; i < N; i++) {
+		swap(___, i);
+		run(n + 1);
+		swap(___, i);
+	}
+}
+int main() {
+	int i;
+	for (i = 0; i < N; i++) {
+		x[i] = i + 1;
+	}
+	run(0);
+	printf("* Total: %d\n", count);
+}
+A n + 1, n, n + 1
+B n + 1, n, n
+C n, n, n
+D n, n + 1, n + 1
+E n + 1, n + 1, n + 1
+F n, n, n + 1
+
+#10若PAT是一个类，则程序运行时，语句“PAT(*ad)[3]; ”调用PAT的构造函数的次数是C
+A 2
+B 3
+C 0
+D 1
+注解:ad是一个指针，指针不调用构造函数
 #endif
