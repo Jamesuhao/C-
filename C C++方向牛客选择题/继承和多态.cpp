@@ -154,4 +154,49 @@ A static_cast
 B reinterpret_cast
 C dynamic_cast
 D const_cas
+
+#9如果类B继承类A，A::x()被声明为虚函数，B::x()重载了A::x()方法，在下述语句中哪个x()方法会被调用(B)？？？
+A A::x()
+B B::x()
+C A::x() B::x()
+D B::x() A::x()
+
+#10下列一段C++代码的输出是(C) ???
+#include "stdio.h"
+class Base
+{
+public:
+	int Bar(char x)
+	{
+		return (int)(x);
+	}
+	virtual int Bar(int x)
+	{
+		return (2 * x);
+	}
+};
+class Derived : public Base
+{
+public:
+	int Bar(char x)
+	{
+		return (int)(-x);
+	}
+	int Bar(int x)
+	{
+		return (x / 2);
+	}
+};
+int main(void)
+{
+	Derived Obj;
+	Base* pObj = &Obj;
+	printf("%d,", pObj->Bar((char)(100)));
+	printf("%d,", pObj->Bar(100));
+}
+A 100， - 100
+B 100，50
+C 200， - 100
+D 200，50
+
 #endif

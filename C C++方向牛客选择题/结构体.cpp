@@ -56,4 +56,30 @@ unsigned long：8个字节
 long：4个字节
 unsigned long：4个字节
 a1:0~7 a2:8~11 a3:12~15 a4:16~19 8字节对齐：共占24个字节
+
+#4在一个64位操作系统下，有如下结构体，上述fool()程序的执行结果为（A）
+struct st_task
+{
+	uint16_t id;
+	uint32_t value;
+	uint64_t timestamp;
+};
+void fool()
+{
+	st_task task = {};
+	uint64_t a = 0x00010001;
+	memcpy(&task, &a, sizeof(uint64_t));
+	printf("%11u,%11u,%11u", task.id, task.value, task.timestamp);
+}
+A 1，0，0
+B 1，1，0
+C 0，1，1
+D 0，0，1
+注解：
+1字节     uint8_t
+2字节     uint16_t
+4字节     uint32_t
+8字节     uint64_t
+因为value是4字节对齐，所以id占四个字节，value占4个字节，timestamp占8个字节
+小端，id为1 value为0 timpstamp为0
 #endif

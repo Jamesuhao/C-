@@ -39,4 +39,26 @@ A int* a;
 B extern const int array[256];  //extern引用外部变量
 C const int& ra;//引用变量必须赋初值
 D typedef void (*FUN)();
+
+#5函数func的定义如下：以下代码在vs中输出结果为(D)
+void func(const int& v1, const int& v2)
+{
+	std::cout << v1 << ' ';
+	std::cout << v2 << ' ';
+}
+int main(int argc, char* argv[])
+{
+	int i = 0;
+	func(++i, i++);
+	return 0;
+}
+A 0 1
+B 1 2
+C 2 1
+D 2 0
+E 程序强制终止并报错
+F 结果与编译器有关
+注解：程序编译时函数参数是从右向左进行编译入栈的，所以先对i执行后置++,此时形参2依旧为0，i为1，
+再对i执行前置++，形参1为2；
+所以输出2，0。
 #endif 
