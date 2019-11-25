@@ -199,4 +199,98 @@ B 100，50
 C 200， - 100
 D 200，50
 
+#11假定CSomething是一个类，执行下面这些语句之后，内存里创建了(6)个CSomething对象
+CSomething a();
+CSomething b(2);
+CSomething c[3] = new CSomething(0);
+CSomething& ra = b;
+CSomething d = b;
+CSomething* pA = c;
+CSomething* p = new CSomething(4);
+注解：
+CSomething a()；// 没有创建对象，这里不是使用默认构造函数，而是定义了一个函
+CSomething b(2);//使用一个参数的构造函数，创建了一个对象。
+CSomething c[3];//使用无参构造函数，创建了3个对象。
+CSomething& ra = b;//ra引用b，没有创建新对象。
+CSomething d = b;//使用拷贝构造函数，创建了一个新的对象d。
+CSomething* pA = c;//创建指针，指向对象c，没有构造新对象。
+CSomething* p = new CSomething(4);//新建一个对象。
+
+#12下面这段代码运行时会出现什么问题(B) ???
+class A
+{
+public:
+	void f()
+	{
+		printf("A\n");
+	}
+};
+class B : public A
+{
+public:
+	virtual void f()
+	{
+		printf("B\n");
+	}
+};
+int main()
+{
+	A* a = new B;
+	a->f();
+	delete a;
+	return 0;
+
+}
+A 没有问题，输出B
+B 不符合预期的输出A
+C 程序不正确
+D 以上答案都不正确
+
+#13下面这段代码会打印出什么(A)???
+class A
+{
+public:
+	A()
+	{
+		printf("A ");
+	}
+	~A()
+	{
+		printf("deA ");
+	}
+};
+class B
+{
+public:
+	B()
+	{
+		printf("B ");
+	}
+	~B()
+	{
+		printf("deB ");
+	}
+};
+class C : public A, public B
+{
+public:
+	C()
+	{
+		printf("C ");
+	}
+	~C()
+	{
+		printf("deC ");
+	}
+};
+int main()
+{
+	A* a = new C();
+	delete a;
+	return 0;
+}
+A A B C deA
+B C A B deA
+C A B C deC
+D C A B deC
 #endif

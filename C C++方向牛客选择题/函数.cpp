@@ -138,4 +138,126 @@ D 把汇编语言翻译成机器语言
 源代码－－ > 预处理－－ > 编译－－ > 优化－－ > 汇编－－ > 链接-- > 可执行文件
 汇编阶段把 汇编语言代码 / 中间代码 翻译成目标机器指令。对于被翻译系统处理的每一个C语言源程序，
 都将最终经过这一处理而得到相应的目标文件。（代码生成阶段）
+
+#12下面程序会输出什么？(B)
+#include<stdio.h>
+using namespace std;
+static int a = 1;
+void fun1() { a = 2; }
+void fun2() { int a = 3; }
+void fun3() { static int a = 4; }
+int main()
+{
+	printf("%d ", a);
+	fun1();
+	printf("%d ", a);
+	fun2();
+	printf("%d ", a);
+	fun3();
+	printf("%d ", a);
+}
+A 1 2 3 4
+B 1 2 2 2
+C 1 2 2 4
+D 1 1 1 4
+注解：
+1.static修饰局部变量 -> 静态局部变量
+改变的是局部变量的生命周期-->使得被修饰的变量的生命周期扩大到整个程序，作用域不变。
+2.static修饰全部变量 -> 静态全局变量 
+改变的是全局变量的作用域-->使得被修饰的变量只能在自己的源文件内部可以使用，生命周期不变。
+3.static修饰函数
+改变的是函数的链接属性(外部连接属性->内部链接属性)
+
+#13以下程序输出的结果为？(C)
+int FindSubString(char* pch)
+{
+	int count = 0;
+	char* p1 = pch;
+	while (*p1 != '\0')
+	{
+		if (*p1 == p1[1] - 1)
+		{
+			p1++;
+			count++;
+		}
+		else {
+			break;
+		}
+	}
+	int count2 = count;
+	while (*p1 != '\0')
+	{
+		if (*p1 == p1[1] + 1)
+		{
+			p1++;
+			count2--;
+		}
+		else {
+			break;
+		}
+	}
+	if (count2 == 0)
+		return(count);
+	return(0);
+}
+void ModifyString(char* pText)
+{
+	char* p1 = pText;
+	char* p2 = p1;
+	while (*p1 != '\0')
+	{
+		int count = FindSubString(p1);
+		if (count > 0)
+		{
+			*p2++ = *p1;
+			sprintf(p2, "%i", count);
+			while (*p2 != '\0')
+			{
+				p2++;
+			}
+			p1 += count + count + 1;
+		}
+		else {
+			*p2++ = *p1++;
+		}
+	}
+}
+int main()
+{
+	char text[32] = "XYBCDCBABABA";
+	ModifyString(text);
+	printf(text);
+}
+A XYBCDCBABABA
+B XYBCBCDA1BAA
+C XYBCDCBA1BAA
+D XYBCDDBA1BAB
+注解：
+sprintf(char* str, "%x", c);函数将变量c按照%后的格式写入到str所指向的位置，并且后加一个'\0'；
+
+#14关于以下代码，哪个说法是正确的？
+myClass::foo() {
+	delete this;
+}
+..
+void func() {
+	myClass* a = new myClass();
+	a->foo();
+}
+A 它会引起栈溢出
+B 都不正确
+C 它不能编译
+D 它会引起段错误
+注解：
+作者：我女朋友姓王
+链接：https ://www.nowcoder.com/questionTerminal/45bb35c18c434829af740c0d843fcb1e
+来源：牛客网
+
+delete this（对象请求*** ）是允许的，但是必须保证 :
+-1 : 该this对象是100 % new出来的，并且是最普通的new出来的，不能是new[]，定位new等等
+-2 : 该成员函数是this对象最后调用的成员函数（因为成员函数第一个参数是隐藏的this指针）
+-3 : delete this之后必须保证不能访问到成员变量和虚函数（原因同楼主）
+-4 : delete this不能放在析构函数中，否则递归(delete this会去调用本对象的析构函数，而析构函数中又调用delete this，形成无限递归，造成堆栈溢出，系统崩溃。)
+题目中this对象是通过最普通的new产生的，并且之调用了foo成员函数，即保证了foo是最后一个this调用的成员函数，
+且之后没有访问成员函数和虚函数的操作，因此没有问题。
 #endif
