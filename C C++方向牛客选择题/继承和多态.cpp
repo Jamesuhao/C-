@@ -293,4 +293,14 @@ A A B C deA
 B C A B deA
 C A B C deC
 D C A B deC
+
+#14以下关于STL的描述中，C错的。
+A STL容器是线程不安全的
+B 当容量不够时，vector内部内存扩展方式是翻倍
+C std::sort是稳定排序
+D std::bitset不是一个STL容器
+E std::stack默认是用deque实现的
+F std::string中可以存储多个’\0’字符
+注解：
+sort()排序不是稳定排序，sort是主要用到了快速排序O(nlogn),插入排序O(n2)和堆排序O(nlogn）。
 #endif

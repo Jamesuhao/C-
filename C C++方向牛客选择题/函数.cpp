@@ -249,15 +249,27 @@ B 都不正确
 C 它不能编译
 D 它会引起段错误
 注解：
-作者：我女朋友姓王
-链接：https ://www.nowcoder.com/questionTerminal/45bb35c18c434829af740c0d843fcb1e
-来源：牛客网
-
 delete this（对象请求*** ）是允许的，但是必须保证 :
 -1 : 该this对象是100 % new出来的，并且是最普通的new出来的，不能是new[]，定位new等等
--2 : 该成员函数是this对象最后调用的成员函数（因为成员函数第一个参数是隐藏的this指针）
--3 : delete this之后必须保证不能访问到成员变量和虚函数（原因同楼主）
--4 : delete this不能放在析构函数中，否则递归(delete this会去调用本对象的析构函数，而析构函数中又调用delete this，形成无限递归，造成堆栈溢出，系统崩溃。)
+- 2 : 该成员函数是this对象最后调用的成员函数（因为成员函数第一个参数是隐藏的this指针）
+- 3 : delete this之后必须保证不能访问到成员变量和虚函数（原因同楼主）
+- 4 : delete this不能放在析构函数中，否则递归(delete this会去调用本对象的析构函数，而析构函数中又调用delete this，形成无限递归，造成堆栈溢出，系统崩溃。)
 题目中this对象是通过最普通的new产生的，并且之调用了foo成员函数，即保证了foo是最后一个this调用的成员函数，
 且之后没有访问成员函数和虚函数的操作，因此没有问题。
+
+#15以下代码共调用多少次拷贝构造函数：D
+Widget f(Widget u)
+{
+	Widget v(u);
+	Widget w = v;
+	return w;
+}
+main() {
+	Widget x;
+	Widget y = f(f(x));
+}
+A 1
+B 3
+C 5
+D 7
 #endif
