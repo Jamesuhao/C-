@@ -127,6 +127,7 @@
     <ClCompile Include="字符串.cpp" />
     <ClCompile Include="指针.cpp" />
     <ClCompile Include="数据类型.cpp" />
+    <ClCompile Include="数据结构.cpp" />
     <ClCompile Include="数组.cpp" />
     <ClCompile Include="结构体.cpp" />
     <ClCompile Include="继承和多态.cpp" />

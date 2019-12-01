@@ -42,5 +42,8 @@
     <ClCompile Include="继承和多态.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="数据结构.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

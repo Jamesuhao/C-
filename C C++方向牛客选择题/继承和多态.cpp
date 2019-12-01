@@ -303,4 +303,40 @@ E std::stack默认是用deque实现的
 F std::string中可以存储多个’\0’字符
 注解：
 sort()排序不是稳定排序，sort是主要用到了快速排序O(nlogn),插入排序O(n2)和堆排序O(nlogn）。
+
+#14下面程序输出什么(C)        ？？？
+#include <iostream>
+using namespace std;
+class A
+{
+public:
+	void print()
+	{
+		cout << "A:print()";
+	}
+};
+class B : private A
+{
+public:
+	void print()
+	{
+		cout << "B:print()";
+	}
+};
+class C : public B
+{
+public:
+	void print()
+	{
+		A::print();
+	}
+};
+int main()
+{
+	C b;
+	b.print();
+}
+A A : print()
+B B : print()
+C 编译出错
 #endif
