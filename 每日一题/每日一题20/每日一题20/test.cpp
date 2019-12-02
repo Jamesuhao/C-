@@ -16,19 +16,13 @@ dcba
 #include<iostream>
 #include<string>
 using namespace std;
-void Swap(char& a, char& b)
-{
-	auto tmp = a;
-	a = b;
-	b = tmp;
-}
 void Reverse(string& str)
 {
 	auto start = str.begin();
 	auto end = str.end() - 1;
-	while (start != end)
+	while (start <= end)
 	{
-		Swap(*start, *end);
+		swap(*start, *end);
 		++start;
 		--end;
 	}
@@ -56,11 +50,21 @@ int main()
 输出一个整数
 示例1
 输入
-复制
-asdfas werasdfaswer
+asdfas 
+werasdfaswer
 输出
-复制
 6
+解题思路：
+求最大公共子串，使用递推实现 假设 x(i): 字符串第i个字符 y(j): 字符串第j个字符 
+vec[i][j]: 以x(i),y(j)结尾的最大子串长度 比如：x: "abcde" y:"bcdae"
+vec[2][1]: 以x(2),y(1)结尾的最大子串长度 即：x遍历到"abc", y遍历到"bc", 都以字符'c'结尾时最大公共子串为"bc" 
+故：当计算vec[i][j]时，首先看x(i),y(j)的值： 
+(1）: x(i) == y(j)
+当前两个字符串结尾的字符相等，vec[i][j] = vec[i-1][j-1] + 1 即个它的长度加1 
+(2）: x(i) != y(j) 
+当前两个字符串结尾的字符不相等，说明没有以这连个字符结尾的公共子串 即dp[i][j] = 0 
+(3）: dp[0][j] 和 dp[i][0]表示以某个子串的第一个字符结尾，最大长度为1 如果x(0) == y(j) 或者 x(i) == y(0), 则长度为1，否则为0 
+当dp中的所有元素计算完之后，从中找打最大的值输出
 */
 #include<iostream>
 #include<string>
@@ -72,14 +76,23 @@ int Maxcount(string& str1, string& str2)
 	int len2 = str2.size();
 	int max = 0;
 	vector<vector<int>>vec(len1 + 1, vector<int>(len2 + 1, 0));
-	for (int i = 1; i <= len1; ++i)
+	for (int i = 0; i <= len1; ++i)
 	{
-		for (int j = 1; j <= len2; ++j)
+		for (int j = 0; j <= len2; ++j)
 		{
-			if (str1[i - 1] == str2[j - 1])
+			//如果当前结尾的字符相等，则在vec[i-1][j-1]的基础上加1
+			if (str1[i] == str2[j])
 			{
-				vec[i][j] = vec[i - 1][j - 1] + 1;
+				if (i >= 1 && j >= 1)
+				{
+					vec[i][j] = vec[i - 1][j - 1] + 1;
+				}
+				else//vec[i][0] or vec[0][j]
+				{
+					vec[i][j] = 1;
+				}
 			}
+			//更新最大值
 			if (vec[i][j] > max)
 			{
 				max = vec[i][j];
