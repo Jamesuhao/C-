@@ -28,64 +28,58 @@
 复制
 1 4 2 5 3 6 1 5 4 3 2 6 1 1 1 1
 */
+#endif
+
 #include<iostream>
 #include<vector>
-#include<algorithm>
 using namespace std;
-vector<int> sort(vector<int>& vec)
-{
-	vector<int>tmp;
-	int size = vec.size();
-	int n = size / 2;
-	int j = 1;
-	while (n)
-	{
-		tmp.push_back(vec[size - j]);
-		tmp.push_back(vec[size / 2] - j);
-		--n;
-		++j;
-	}
-	for (int i = 0; i < tmp.size() / 2; ++i)
-	{
-		swap(tmp[i], tmp[tmp.size() - 1 - i]);
-	}
-	return tmp;
-}
 int main()
 {
-	int time;
-	cin >> time;
-	int n, k;
-	while (time)
+	//T为共有多少组数据
+	//n为数据总数的一半
+	//k为每组数据共需洗牌的次数
+	int T, n, k;
+	cin >> T;
+	while (T)
 	{
 		cin >> n >> k;
-		vector<int>vec(2 * n);
+		//vec1存储初始数据以及洗过牌但未达到洗牌次数的数据
+		vector<int>vec1(2 * n, 0);
+		//输入数据
 		for (int i = 0; i < 2 * n; ++i)
 		{
-			cin >> vec[i];
+			cin >> vec1[i];
 		}
+		//重复洗牌
 		while (k)
 		{
-			vec = sort(vec);
+			//vec2为临时存储数据的数组，用以改变vec1中元素的位置
+			vector<int>vec2(vec1.begin(), vec1.end());
+			//一次洗牌共调整n次，小于n(左手)与大于n(右手)的数据一起调整
+			for (int i = 0; i < n; ++i)
+			{
+				//小于n(左手)的数据一次洗牌后i位置元素就被放到了2*i的位置
+				vec1[2 * i] = vec2[i];
+				//大于n(右手)的数据一次洗牌后i+n位置的元素就被放到了2*i+1的位置
+				vec1[2 * i + 1] = vec2[i + n];
+			}
+			//一次洗牌完成后，减少洗牌的次数
 			--k;
 		}
-		for (int i = 0; i < vec.size(); ++i)
+		//一组数据洗牌完成后输出该组数据
+		//因题目要求每一行输出末尾不能有多余的空格，所以先输出前2*n-1个数据
+		for (int i = 0; i < 2 * n - 1; ++i)
 		{
-			if (i != vec.size() - 1)
-			{
-				cout << vec[i] << " ";
-			}
-			else
-			{
-				cout << vec[i];
-			}
+			cout << vec1[i] << " ";
 		}
-		cout << endl;
-		--time;
+		//在输出第n个数据
+		cout << vec1[2 * n - 1] << endl;
+		//一组数据输出后，减少数据的组数
+		--T;
 	}
 	return 0;
 }
-#endif
+
 
 //#2MP3光标的位置
 #if 0
