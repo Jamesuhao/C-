@@ -59,7 +59,7 @@ int main()
 		//重复洗牌
 		while (k)
 		{
-			//vec2为临时存储数据的数组，用以改变vec1中元素的位置
+			//vec2为临时存储数据的数组，，是vec1的一份拷贝，用以改变vec1中元素的位置。
 			vector<int>vec2(vec1.begin(), vec1.end());
 			//一次洗牌共调整n次，小于n(左手)与大于n(右手)的数据一起调整
 			for (int i = 0; i < n; ++i)
