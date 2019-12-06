@@ -31,11 +31,11 @@ void Choose_Alg(My_Node *mylist,My_Job &job,Al_Size &al)
 			break;
 		//首次适应算法
 		case 3:
-			My_FF(mylist,job,al,0);
+			My_FF(mylist, job, al,0);
 			break;
 		//循环首次适应算法
 		case 4:
-			My_NF(mylist,job,al);
+			My_NF(mylist, mylist,job, al, 0);
 			break;
 	default:
 		//输入错误
@@ -49,7 +49,7 @@ void Choose_Alg(My_Node *mylist,My_Job &job,Al_Size &al)
 void Choose_Free(My_Node *mylist,My_Job &job,Al_Size &al)
 {
 	int choose = 0;
-	printf("\t\t\t**************请选择**************\n\n");
+	printf("\t\t**************请选择**************\n\n");
 	printf("\t\t1、回收上一道作业分配内存\n");
 	printf("\t\t2、继续为作业分配内存\n");
 	printf("\t\t0、退出\n");
@@ -79,15 +79,15 @@ void Init_List(My_Node *mylist)
 {
 	if(mylist == NULL) return;
 	mylist->next = mylist;
+	mylist->Empty_Size.Size = -1;
 }
 //分区分配
 void Input_EmptyTable(My_Node *mylist)
 {
 	int x = 0;
 	My_Node *p = mylist;
-	My_Node *n = mylist->next;
-	printf("\n***********************空闲分区表************************\n");	
-	printf("请输入分区个数：\n");
+	My_Node *n = mylist->next;	
+	printf("请输入分区个数：");
 	cin >> x;
 	for (int i = 1; i <= x; i++)
 	{
@@ -110,10 +110,8 @@ void Input_EmptyTable(My_Node *mylist)
 //输入作业
 void Get_Job(My_Job &job)
 {
-	printf("\n*********************************************************\n");
 	printf("\n请输入作业名和作业大小：");
 	cin >> job.Process_Name >> job.Mem_Size;
-	printf("\n*********************************************************\n");
 	printf("\n作业名：%c  作业大小：%d\n\n",job.Process_Name,job.Mem_Size);
 }
 //最佳适应算法按分区大小由小到大排序
@@ -152,11 +150,12 @@ void My_BF(My_Node* mylist, My_Job& job, Al_Size& al, int flag)
 	if (flag==0)
 	{
 		Input_EmptyTable(mylist);
-		Show(mylist);
-		Sort_BF(mylist);
 	}
+	Sort_BF(mylist);
 	Get_Job(job);
+	printf("分配前的空白分区表：\n");
 	Print_EmptyTable(mylist);
+	printf("分配前的空白分区链：\n");
 	Show(mylist);
 	My_Node *p = mylist->next;
 	while(p != mylist)
@@ -171,11 +170,11 @@ void My_BF(My_Node* mylist, My_Job& job, Al_Size& al, int flag)
 		}
 		p = p->next;
 	}
+	printf("分配后的空白分区表：\n");
 	Print_EmptyTable(mylist);
-	Sort_BF(mylist);
-	Show(mylist);	
-	Print_EmptyTable(mylist);
-	printf("\t\t\t**************请选择**************\n\n");
+	printf("分配后的空白分区链：\n");
+	Show(mylist);
+	printf("\t\t**************请选择**************\n\n");
 	printf("\t\t0、退出\n");
 	printf("\t\t1、继续为作业分配内存\n");
 	printf("\t\t2、重新选择算法\n");
@@ -203,6 +202,7 @@ void My_BF(My_Node* mylist, My_Job& job, Al_Size& al, int flag)
 		break;
 	}
 }
+
 //最坏适应算法按分区大小由大到小排序
 void Sort_WF(My_Node *mylist)
 {
@@ -230,17 +230,20 @@ void Sort_WF(My_Node *mylist)
 		p = mylist->next;
 	}
 }
+
 //最坏适应算法
 void My_WF(My_Node *mylist,My_Job &job,Al_Size &al,int flag)
 {
 	if (flag == 0)
 	{
 		Input_EmptyTable(mylist);
-		Sort_WF(mylist);
-		Show(mylist);
 	}
+	Sort_WF(mylist);
 	Get_Job(job);
+	printf("分配前的空白分区表：\n");
 	Print_EmptyTable(mylist);
+	printf("分配前的空白分区链：\n");
+	Show(mylist);
 	My_Node *p = mylist->next;
 	while(p != mylist)
 	{
@@ -254,11 +257,11 @@ void My_WF(My_Node *mylist,My_Job &job,Al_Size &al,int flag)
 		}
 		p = p->next;
 	}
+	printf("分配后的空白分区表：\n");
 	Print_EmptyTable(mylist);
-	Sort_WF(mylist);
-	Show(mylist);	
-	Print_EmptyTable(mylist);
-	printf("\t\t\t**************请选择**************\n\n");
+	printf("分配后的空白分区链：\n");
+	Show(mylist);
+	printf("\t\t**************请选择**************\n\n");
 	printf("\t\t1、继续为作业分配内存\n");
 	printf("\t\t2、重新选择算法\n");
 	printf("\t\t3、回收上一道作业的内存\n");
@@ -286,16 +289,17 @@ void My_WF(My_Node *mylist,My_Job &job,Al_Size &al,int flag)
 		break;
 	}
 }
-//
+
+//首次适应算法按地址递增排序
 void Sort(My_Node* mylist)
 {
-	My_Node* p = mylist;
+	My_Node* p = mylist->next;
 	My_Node* end = mylist;
 	while (mylist->next != end)
 	{
 		while (p->next != end)
 		{
-			if (p->Empty_Size.Start_Add < p->next->Empty_Size.Start_Add)
+			if (p->Empty_Size.Start_Add > p->next->Empty_Size.Start_Add)
 			{
 				int tmp1 = p->Empty_Size.Size;
 				int tmp2 = p->Empty_Size.Start_Add;
@@ -308,36 +312,39 @@ void Sort(My_Node* mylist)
 			p = p->next;
 		}
 		end = p;
-		p = mylist;
+		p = mylist->next;
 	}
 }
 //首次适应算法
-void My_FF(My_Node *mylist,My_Job &job,Al_Size &al,int flag)
+void My_FF(My_Node* mylist, My_Job& job, Al_Size& al,int flag)
 {
 	if (flag == 0)
 	{
 		Input_EmptyTable(mylist);
-		Show(mylist);
-		Sort(mylist);;
+		Sort(mylist);
 	}
 	Get_Job(job);
+	printf("分配前的空白分区表：\n");
 	Print_EmptyTable(mylist);
-	Sort(mylist);
+	printf("分配前的空白分区链：\n");
 	Show(mylist);
-	My_Node *p = mylist->next;
-	while(p != mylist)
+	My_Node* p = mylist->next;
+	while (p != mylist)
 	{
-		if(p->Empty_Size.Size >= job.Mem_Size)
+		if (p->Empty_Size.Size >= job.Mem_Size)
 		{
 			al.Start_Add = p->Empty_Size.Start_Add;
 			al.Size = job.Mem_Size;
 			p->Empty_Size.Size -= job.Mem_Size;
 			p->Empty_Size.Start_Add += job.Mem_Size;
+			p = p->next;
 			break;
 		}
 		p = p->next;
 	}
+	printf("分配后的空白分区表：\n");
 	Print_EmptyTable(mylist);
+	printf("分配后的空白分区链：\n");
 	Show(mylist);
 	printf("\t\t\t**************请选择**************\n\n");
 	printf("\t\t1、继续为作业分配内存\n");
@@ -353,7 +360,7 @@ void My_FF(My_Node *mylist,My_Job &job,Al_Size &al,int flag)
 		break;
 		//继续为作业分配内存
 	case 1:
-		My_FF(p->next, job, al, 1);
+		My_FF(mylist, job, al, 1);
 		break;
 		//重新选择算法
 	case 2:
@@ -367,29 +374,78 @@ void My_FF(My_Node *mylist,My_Job &job,Al_Size &al,int flag)
 		break;
 	}
 }
-//循环首次适应算法
-void My_NF(My_Node *mylist,My_Job &job,Al_Size &al)
+//首次循环适应算法
+void My_NF(My_Node *mylist, My_Node* p, My_Job &job,Al_Size &al,int flag)
 {
-	Input_EmptyTable(mylist);
-	Get_Job(job);
-	Print_EmptyTable(mylist);
-	Show(mylist);
-	My_Node *p = mylist->next;
-	while(p != mylist)
+	if (flag == 0)
 	{
+		Input_EmptyTable(mylist);
+		Sort(mylist);
+		p = mylist->next;
+	}
+	My_Node* q = p;
+	Get_Job(job);
+	printf("分配前的空白分区表：\n");
+	Print_EmptyTable(mylist);
+	printf("分配前的空白分区链：\n");
+	Show(mylist);
+	int count = 0;
+	while(p->next != q)
+	{
+		
 		if(p->Empty_Size.Size >= job.Mem_Size)
 		{
 			al.Start_Add = p->Empty_Size.Start_Add;
 			al.Size = job.Mem_Size;
 			p->Empty_Size.Size -= job.Mem_Size;
 			p->Empty_Size.Start_Add += job.Mem_Size;
+			p = p->next;
+			count++;
 			break;
 		}
 		p = p->next;
 	}
-	Print_EmptyTable(mylist);
-	Choose_Free(mylist,job,al);
+	if (!count)
+	{
+		printf("暂无满足作业大小的分区！\n");
+		p = q;
+	}
+	else
+	{
+		printf("分配后的空白分区表：\n");
+		Print_EmptyTable(mylist);
+		printf("分配后的空白分区链：\n");
+		Show(mylist);
+	}
+	printf("\t\t\t**************请选择**************\n\n");
+	printf("\t\t1、继续为作业分配内存\n");
+	printf("\t\t2、重新选择算法\n");
+	printf("\t\t3、回收上一道作业的内存\n");
+	printf("\t\t0、退出\n");
+	int choose = 0;
+	cin >> choose;
+	switch (choose)
+	{
+	case 0:
+		printf("你已经选择退出！\n\n");
+		break;
+		//继续为作业分配内存
+	case 1:
+		My_NF(mylist,p, job, al, 1);
+		break;
+		//重新选择算法
+	case 2:
+		Choose_Alg(mylist, job, al);
+		break;
+	case 3:
+		Free(mylist, job, al);
+	default:
+		printf("\nInput Error!  Please input again!\n");
+		Choose_Alg(mylist, job, al);
+		break;
+	}
 }
+
 //回收
 void Free(My_Node *mylist,My_Job &job,Al_Size &al)
 {
@@ -409,27 +465,29 @@ void Free(My_Node *mylist,My_Job &job,Al_Size &al)
 void Print_EmptyTable(My_Node *mylist)
 {
 	My_Node *p = mylist->next;
-	printf("\n***********************空闲分区表************************\n\n");
 	printf("\t\t区号\t大小\t起址\n");
 	while(p != mylist)
 	{
-		printf("\t\t%d\t%d\t%d\n",p->Empty_Size.Num,p->Empty_Size.Size,p->Empty_Size.Start_Add);
+		if (p->Empty_Size.Size != 0)
+		{
+			printf("\t\t%d\t%d\t%d\n", p->Empty_Size.Num, p->Empty_Size.Size, p->Empty_Size.Start_Add);
+		}
 		p = p->next;
 	}
-	printf("\n*********************************************************\n");
 }
 //输出分区链
 void Show(My_Node *mylist)
 {
-	printf("\n***********************空闲分区链************************\n\n");
 	My_Node *p = mylist->next;
 	while(p != mylist)
-	{			
-		printf("%d",p->Empty_Size.Size);
-		if(p->next != mylist)
-			printf("--->");
+	{		
+		if (p->Empty_Size.Size != 0)
+		{
+			printf("%d", p->Empty_Size.Size);
+			if (p->next != mylist)
+				printf("--->");
+		}
 		p = p->next;
 	}
 	printf("\n");
-	printf("\n*********************************************************\n");
 }

@@ -38,6 +38,6 @@ void Print_EmptyTable(My_Node *mylist);
 void Free(My_Node *mylist,My_Job &job,Al_Size &al);
 void My_BF(My_Node *mylist,My_Job &job,Al_Size &al,int flag);
 void My_WF(My_Node *mylist,My_Job &job,Al_Size &al,int flag);
-void My_FF(My_Node *mylist,My_Job &job,Al_Size &al,int flag);
-void My_NF(My_Node *mylist,My_Job &job,Al_Size &al);
+void My_NF(My_Node *mylist,My_Node* p,My_Job &job,Al_Size &al,int flag);
+void My_FF(My_Node* mylist, My_Job& job, Al_Size& al, int flag);
 void Show(My_Node *mylist);
