@@ -17,9 +17,10 @@ void choose_Alg(Node* mylist);
 void Init(Node* mylist);
 void Input_Process(Node* mylist);
 Node* copy(Node* mylist);
-void Sort(Node* mylist);
-void FCFS(Node* mylist);
-void SJF(Node* mylist);
-void RR(Node* mylist);
+void FCFS_Sort(Node* mylist);
+void FCFS(Node* mylist, int flag);
+void SJF_Sort(Node* mylist);
+void SJF(Node* mylist, int flag);
+void RR(Node* mylist, int flag);
 void Print(Node* mylist);
 
