@@ -1,9 +1,10 @@
 #include"ProcessScheduling.h"
 #include<iostream>
 #include<vector>
+#include<queue>
 using namespace std;
 
-void choose_Alg(Node* mylist)
+void choose_Alg(Node* mylist, Node* m_mylist)
 {
 	cout << "**********进程调度**********" << endl;
 	cout << "请选择算法:" << endl;
@@ -19,23 +20,24 @@ void choose_Alg(Node* mylist)
 		cout << "您已经选择退出" << endl;
 		return;
 	case 1:
-		FCFS(mylist,0);
+		FCFS(mylist,0,m_mylist);
 		break;
 	case 2:
-		SJF(mylist,0);
+		SJF(mylist,0, m_mylist);
 		break;
 	case 3:
-		RR(mylist,0);
+		RR(mylist,0, m_mylist);
 		break;
 	}
 }
-void Init(Node* mylist)
+void Init(Node* mylist, Node* m_mylist)
 {
-	if (mylist == nullptr)
+	if (mylist == nullptr||m_mylist==nullptr)
 	{
 		return;
 	}
 	mylist->next = nullptr;
+	m_mylist->next = nullptr;
 }
 void Input_Process(Node* mylist)
 {
@@ -54,17 +56,18 @@ void Input_Process(Node* mylist)
 		cout << "请输入第"<<i+1<<"个进程的到达时间和服务时间："<<endl;
 		cin >> n->process.Arrive >> n->process.Serivece;
 		n->process.num = i+1;
+		n->process.Complete = 0;
+		n->process.serivece = n->process.Serivece;
 		p->next = n;
 		p = p->next;
 		p->next = nullptr;
 	}
 }
-Node* copy(Node* mylist)
+Node* copy(Node* mylist,Node* m_mylist)
 {
 	Node* p = mylist->next;
-	Node* n = mylist;
-	Node* q = mylist;
-	Node* r = q;
+	Node* n;
+	Node* q = m_mylist;
 	while (p)
 	{
 		n = (Node*)malloc(sizeof(Node));
@@ -75,12 +78,14 @@ Node* copy(Node* mylist)
 		n->process.num = p->process.num;
 		n->process.Arrive = p->process.Arrive;
 		n->process.Serivece = p->process.Serivece;
+		n->process.Complete = p->process.Complete;
+		n->process.serivece = p->process.serivece;
 		p = p->next;
 		q->next = n;
 		q = q->next;
 		q->next = nullptr;
 	}
-	return r;
+	return m_mylist;
 }
 //FCFS按作业到达时间排序
 void FCFS_Sort(Node* mylist)
@@ -114,14 +119,14 @@ void FCFS_Sort(Node* mylist)
 		p = mylist->next;
 	}
 }
-void FCFS(Node* mylist,int flag)
+void FCFS(Node* mylist,int flag, Node* m_mylist)
 {
 	cout << "*****FSFC调度算法*****" << endl;
 	if (flag == 0)
 	{
 		Input_Process(mylist);
 	}
-	Node* q = copy(mylist); 
+	Node* q = copy(mylist,m_mylist);
 	FCFS_Sort(mylist);
 	Node* p = mylist->next;
 	p->process.Complete = p->process.Arrive + p->process.Serivece;
@@ -136,6 +141,7 @@ void FCFS(Node* mylist,int flag)
 	cout << "0.退出" << endl;
 	cout << "1.SJF(短作业优先)算法" << endl;
 	cout << "2.RR(时间片轮转)算法" << endl;
+	cout << "3.重新输入数据" << endl;
 	cin >> choose;
 	switch (choose)
 	{
@@ -143,10 +149,13 @@ void FCFS(Node* mylist,int flag)
 		cout << "您已经选择退出" << endl;
 		return;
 	case 1:
-		SJF(q,1);
+		SJF(q,1,m_mylist);
 		break;
 	case 2:
-		RR(q,1);
+		RR(q,1, m_mylist);
+		break;
+	case 3:
+		choose_Alg(mylist, m_mylist);
 		break;
 	}
 }
@@ -181,14 +190,14 @@ void SJF_Sort(Node* mylist)
 		p = mylist;
 	}
 }
-void SJF(Node* mylist,int flag)
+void SJF(Node* mylist,int flag,Node* m_mylist)
 {
 	cout << "*****SJF调度算法*****" << endl;
 	if (flag == 0)
 	{
 		Input_Process(mylist);
 	}
-	Node* q = copy(mylist);
+	Node* q = copy(mylist, m_mylist);
 	FCFS_Sort(mylist);
 	Node* p = mylist->next;
 	p->process.Complete = p->process.Arrive + p->process.Serivece;
@@ -204,6 +213,7 @@ void SJF(Node* mylist,int flag)
 	cout << "0.退出" << endl;
 	cout << "1.FCFS(短作业优先)算法" << endl;
 	cout << "2.RR(时间片轮转)算法" << endl;
+	cout << "3.重新输入数据" << endl;
 	cin >> choose;
 	switch (choose)
 	{
@@ -211,40 +221,81 @@ void SJF(Node* mylist,int flag)
 		cout << "您已经选择退出" << endl;
 		return;
 	case 1:
-		FCFS(q, 1);
+		FCFS(q, 1, m_mylist);
 		break;
 	case 2:
-		RR(q,1);
+		RR(q,1, m_mylist);
+		break;
+	case 3:
+		choose_Alg(mylist, m_mylist);
 		break;
 	}
 }
-void RR(Node* mylist,int flag)
+void RR(Node* mylist,int flag,Node* m_mylist)
 {
 	if (flag == 0)
 	{
 		Input_Process(mylist);
 	}
-	Node* q = copy(mylist);
+	Node* q = copy(mylist, m_mylist);
 	int Timeslice = 0;
+	queue<Node*>que;
 	cout << "请输入时间片大小：" << endl;
 	cin >> Timeslice;
+	FCFS_Sort(mylist);
+	Node* p = mylist->next;
+	que.push(p);
+	int count = 0;
+	while (!que.empty())
+	{
+		//count:所有进程已服务的时间
+		//Timeslice:表示时间片
+		que.front()->process.serivece = que.front()->process.serivece  - Timeslice;
+		while (p->next != nullptr && p->next->process.Arrive <= (que.front()->process.Arrive + Timeslice + count))
+		{
+			que.push(p->next);
+			p = p->next;
+		}
+		if (que.front()->process.serivece == -1)
+		{
+			count += 1;
+		}
+		else
+		{
+			count += 2;
+		}
+		if (que.front()->process.serivece <= 0)
+		{
+			que.front()->process.Complete += count;
+			que.pop();
+		}
+		else
+		{
+			que.push(que.front());
+			que.pop();
+		}
+	}
 	Print(mylist);
-	int choose;
-	cin >> choose;
+	int choose=0;
 	cout << "请选择算法：" << endl;
 	cout << "0.退出" << endl;
 	cout << "1.FCFS(短作业优先)算法" << endl;
 	cout << "2.SJF(时间片轮转)算法" << endl;
+	cout << "3.重新输入数据" << endl;
+	cin >> choose;
 	switch (choose)
 	{
 	case 0:
 		cout << "您已经选择退出" << endl;
 		return;
 	case 1:
-		FCFS(q, 1);
+		FCFS(q, 1, m_mylist);
 		break;
 	case 2:
-		SJF(q, 1);
+		SJF(q, 1, m_mylist);
+		break;
+	case 3:
+		choose_Alg(mylist, m_mylist);
 		break;
 	}
 }
@@ -262,7 +313,8 @@ void Print(Node* mylist)
 int main()
 {
 	Node mylist;
-	Init(&mylist);
-	choose_Alg(&mylist);
+	Node m_mylist;
+	Init(&mylist, &m_mylist);
+	choose_Alg(&mylist,&m_mylist);
 	return 0;
 }
