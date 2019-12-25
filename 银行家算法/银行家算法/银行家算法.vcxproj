@@ -124,11 +124,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BankerAlgorithm.cpp" />
-    <ClCompile Include="C:\Users\86183\Desktop\16060101130张宁 操作系统课设\BankAlo.cpp" />
-    <ClCompile Include="C:\Users\86183\Desktop\16060101130张宁 操作系统课设\test.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="C:\Users\86183\Desktop\16060101130张宁 操作系统课设\BankAlo.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

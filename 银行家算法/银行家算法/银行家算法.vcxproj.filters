@@ -18,16 +18,5 @@
     <ClCompile Include="BankerAlgorithm.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\86183\Desktop\16060101130张宁 操作系统课设\BankAlo.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\86183\Desktop\16060101130张宁 操作系统课设\test.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="C:\Users\86183\Desktop\16060101130张宁 操作系统课设\BankAlo.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
