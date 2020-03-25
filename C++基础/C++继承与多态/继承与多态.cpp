@@ -1,5 +1,6 @@
 #include<iostream>
 #include<typeinfo>
+#include<string>
 using namespace std;
 /*
 1.继承的本质和原理
@@ -15,7 +16,7 @@ using namespace std;
 */
 //1.继承的本质和原理
 /*
-继承的本质：a.代码的复用   b.
+继承的本质：a.代码的复用   b.在基类中，提供统一的虚函数接口，让派生类进行重写，然后就可以使用多态了。
 类和类之间的关系：
 组合：一部分的关系
 继承：同一种的关系
@@ -113,11 +114,17 @@ b.static静态成员方法不能实现成虚函数，因为静态成员属于类级别的，不通过对象调用。
 基类的析构函数如果是virtual虚函数，那么派生类的析构函数自动处理成virtual虚函数
 在基类的指针(引用)指向堆上new出来的派生类对象的时候，delete pb(基类的指针)，
 它调用析构函数的时候，必须发生动态绑定，否则会导致派生类的析构函数无法调用
+
+问题三：是不是虚函数的调用一定就是动态绑定？
+不是的，在类的构造函数中，调用虚函数，也是动态绑定(构造函数中调用其他函数(虚)，不会发生动态绑定。
+如果用对象本身调用虚函数，则发生静态绑定。
+如果用指针/引用调用虚函数，则发生动态绑定。
 */
+/*
 class Base
 {
 public:
-	Base(int data = 10)
+	Base(int data = 0)
 		:ma(data) 
 	{
 		//cout << "Base()" << endl;
@@ -125,14 +132,14 @@ public:
 	//虚函数
 	virtual void show() { cout << "Base::show()" << endl; }
 	//虚函数
-	virtual void show(int) { cout << "Base::show(int)" << endl; }
+	//virtual void show(int) { cout << "Base::show(int)" << endl; }
 protected:
 	int ma;
 };
 class Derive :public Base
 {
 public:
-	Derive(int data = 20)
+	Derive(int data = 0)
 		:Base(data)
 		, mb(data)
 	{
@@ -144,28 +151,239 @@ private:
 };
 int main()
 {
+	Base b;
+	Derive d;
+	//静态绑定，用对象本身调用虚函数，是静态绑定
+	b.show(); //虚函数 call Base::show
+	d.show();//虚函数 call Base::show
+	//动态绑定(必须由指针调用虚函数)
+	Base* pb1 = &b;
+	pb1->show();
+	Base* pb2 = &d;
+	pb2->show();
+	//动态绑定(必须由引用调用虚函数)
+	Base& rb1 = b;
+	rb1.show();
+	Base& rb2 = d;
+	rb2.show();
+	//动态绑定(虚函数通过指针或者引用变量调用，才会发生动态绑定)
+	Derive* pd1 = &d;
+	pd1->show();
+	Derive& rd2 = d;
+	rd2.show();
 	Derive d(50);
 	Base* pb = &d;
-
-	/*
+	
 	pb->show  Base::show 如果发现show是普通函数，就进行静态绑定
 	pb->show  Base::show 如果发现show是虚函数函数，就进行动态绑定
-	*/
-	pb->show();//静态的绑定(静态指编译时期，绑定指函数的调用)
-	pb->show(10);//静态的绑定(静态指编译时期，绑定指函数的调用)
-
-	cout << sizeof(Base) << endl;//4
-	cout << sizeof(Derive) << endl;//8
-
-	cout << typeid(pb).name() << endl;//class Base*
-	/*
-	pb的类型：Base->先看Base中有没有虚函数
-	如果Base没有虚函数，*pb识别的就是编译时期的类型  *pb<=>Base类型
-	如果Base有虚函数，*pb识别的就是运行时期的类型->RTTI类型
-	pb指向的是派生类对象，所以*pb识别的就是派生类的虚函数表
-	*/
+	
+	//pb->show();//静态的绑定(静态指编译时期，绑定指函数的调用)
+	//pb->show(10);//静态的绑定(静态指编译时期，绑定指函数的调用)
+	//cout << sizeof(Base) << endl;//4
+	//cout << sizeof(Derive) << endl;//8
+	//cout << typeid(pb).name() << endl;//class Base*
+	
+	//pb的类型：Base->先看Base中有没有虚函数
+	//如果Base没有虚函数，*pb识别的就是编译时期的类型  *pb=>Base类型
+	//如果Base有虚函数，*pb识别的就是运行时期的类型->RTTI类型
+	//pb指向的是派生类对象，所以*pb识别的就是派生类的虚函数表
+	
 	cout << typeid(*pb).name() << endl;//class Base
 	return 0;
 }
+*/
+
+//5.如何理解多态？
+/*
+静态(编译时期)的多态：函数重载、模板(函数模板和类模板)
+函数重载：
+bool compare(int,int);
+bool compare(double,double);
+compare(10,20)；call compare_int_int 在编译阶段就确定好调用的函数版本
+compare(10.5,20.5)；call compare_double_double 在编译阶段就确定好调用的函数版本
+模板：
+template<typename T>
+bool compare(T a,T b){}
+compare(10,20)；     =>  int  编译阶段实例化一个compare<int>
+compare(10.5,20.5)；=>double 编译阶段实例化一个compare<double>
+动态(运行时器)的多态：
+在继承结构中，基类指针(引用)指向派生类对象，通过该指针(引用)调用同名覆盖方法。
+基类指针指向那个派生类对象，就会调用哪个派生类对象的覆盖方法，称为多态。
+因为多态底层是通过动态绑定来实现的，基类指针(引用)指向哪个派生类对象，
+就会访问这个派生类对象的虚函数指针，进而访问这个派生类的虚函数表，获取这个派生类的同名覆盖方法，访问该对象的同名覆盖方法
+
+//动物的基类
+class Animal
+{
+public:
+	Animal(string name) :_name(name) {}
+	virtual void bark() {};
+protected:
+	string _name;
+};
+//以下是动物实体类
+class Cat :public Animal
+{
+public:
+	Cat(string name) :Animal(name) {}
+	void bark() { cout << _name << "bark：miao miao!" << endl; }
+};
+class Dog :public Animal
+{
+public:
+	Dog(string name) :Animal(name) {}
+	void bark() { cout << _name << "bark：wang wang!" << endl; }
+};
+class Pig :public Animal
+{
+public:
+	Pig(string name) :Animal(name) {}
+	void bark() { cout << _name << "bark：heng heng!" << endl; }
+};
+//下面的一组bark  API接口无法左到我们软件设计要求的"开-闭"原则
+/*
+软件设计六大原则：
+开-闭原则：对修改关闭，对扩展开放
+void bark(Cat cat)
+{
+	cat.bark();
+}
+void bark(Dog dog)
+{
+	dog.bark();
+}
+void bark(Pig pig)
+{
+	pig.bark();
+}
+void bark(Animal* p)
+{
+	p->bark();//Animal::bark虚函数，发生动态绑定
+	//p->cat   Cat vftable &Cat::bark
+	//p->dog Dog vftable &Dog::bark
+	//p->pig   Pig vftable &Pig::bark
+}
+int main()
+{
+	Cat cat("喵咪");
+	Dog dog("二哈");
+	Pig pig("佩奇");
+
+	//bark(cat);
+	//bark(dog);
+	//bark(pig);
+	bark(&cat);
+	bark(&dog);
+	bark(&pig);
+	return 0;
+}
+*/
+//6.抽象类的设计原理
+/*
+拥有纯虚函数的类，叫做抽象类。
+注意：抽象类不能再实例化对象了，但是可以定义指针和引用变量。
+问题一：抽象类和普通类有什么区别？
+问题二：一般把什么类设计成抽象类？
+一般把基类实现成抽象类，把基类的方法实现成纯虚函数
+*/
+//示例1：动物的基类，定义Animal并不是让Animal抽象某个实体的类型
+//1.string _name;让所有的动物实体类通过继承Animal直接复用该属性
+//2.给所有的派生类保留统一的覆盖/重写接口
+/*
+class Animal
+{
+public:
+	Animal(string name) :_name(name) {}
+	virtual void bark()  = 0;//纯虚函数
+protected:
+	string _name;
+};
+//以下是动物实体类
+class Cat :public Animal
+{
+public:
+	Cat(string name) :Animal(name) {}
+	void bark() { cout << _name << "bark：miao miao!" << endl; }
+};
+class Dog :public Animal
+{
+public:
+	Dog(string name) :Animal(name) {}
+	void bark() { cout << _name << "bark：wang wang!" << endl; }
+};
+class Pig :public Animal
+{
+public:
+	Pig(string name) :Animal(name) {}
+	void bark() { cout << _name << "bark：heng heng!" << endl; }
+};
+void bark(Animal* p)
+{
+	p->bark();//Animal::bark虚函数，发生动态绑定
+}
+*/
+//示例2：汽车的基类
+class Car//抽象类
+{
+public:
+	Car(string name,double oil) :_name(name),_oil(oil) {}
+	double getLeftMiles()//获取汽车剩余油量还能跑的公里数
+	{
+		return _oil * getMilesPerGallon();//发生了动态绑定
+	}
+	string getName()const
+	{
+		return _name;
+	}
+protected:
+	string _name;
+	double _oil;
+	virtual double getMilesPerGallon() = 0;//纯虚函数
+};
+class Bnze :public Car
+{
+public:
+	Bnze(string name, double oil) :Car(name, oil) {  }
+	double getMilesPerGallon() { return 20.0; }
+};
+class Audi :public Car
+{
+public:
+	Audi(string name, double oil) :Car(name, oil) {  }
+	double getMilesPerGallon() { return 18.0; }
+};
+class BMW :public Car
+{
+public:
+	BMW(string name, double oil) :Car(name, oil) {  }
+	double getMilesPerGallon() { return 19.0; }
+};
+//给外部提供一个统一的获取汽车剩余路程数的API
+void showCarLeftMiles(Car& car)
+{
+	cout << car.getName() << "  left miles：" << car.getLeftMiles() << "公里数" << endl;
+}
+int main()
+{
+	/*
+	Cat cat("喵咪");
+	Dog dog("二哈");
+	Pig pig("佩奇");
+
+	bark(&cat);
+	bark(&dog);
+	bark(&pig);
+	*/
+	Bnze b1("奔驰",20.0);
+	Audi a("奥迪",20.0);
+	BMW b2("宝马",20.0);
+
+	showCarLeftMiles(b1);
+	showCarLeftMiles(a);
+	showCarLeftMiles(b2);
+	return 0;
+}
+
+
 
 				
