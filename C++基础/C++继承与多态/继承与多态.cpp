@@ -2,6 +2,7 @@
 #include<typeinfo>
 #include<string>
 using namespace std;
+//0.概要
 /*
 1.继承的本质和原理
 2.派生类的构造过程
@@ -14,6 +15,7 @@ using namespace std;
 9.RTTI
 10.C++四种类型强转
 */
+
 //1.继承的本质和原理
 /*
 继承的本质：a.代码的复用   b.在基类中，提供统一的虚函数接口，让派生类进行重写，然后就可以使用多态了。
@@ -62,6 +64,7 @@ private：
 3.调用派生类自己的析构函数，释放派生类成员可能占用的外部资源(堆内存，文件）
 4.派生类调用基类的析构函数，释放派生类内存中，从基类继承来的成员可能占用的外部资源(堆内存，文件）
 */
+
 //3.重载、隐藏、覆盖(重写)
 /*
 (1)重载关系
@@ -80,6 +83,7 @@ a.如果派生类中的方法，和基类继承来的某个方法，返回值、函数名、参数列表都相同，
 基类指针(引用)		->		派生类对象				N
 派生类指针(引用)   ->	基类对象					Y
 */
+
 //4.虚函数、静态绑定和动态绑定
 /*
 一个类添加了虚函数，对这个类产生的影响？
@@ -278,7 +282,9 @@ int main()
 	return 0;
 }
 */
+
 //6.抽象类的设计原理
+#if 0
 /*
 拥有纯虚函数的类，叫做抽象类。
 注意：抽象类不能再实例化对象了，但是可以定义指针和引用变量。
@@ -383,7 +389,326 @@ int main()
 	showCarLeftMiles(b2);
 	return 0;
 }
+#endif
 
+//7.继承多态笔试题
+/*1.
+class Animal
+{
+public:
+	Animal(string name) :_name(name) {}
+	virtual void bark() = 0;
+protected:
+	string _name;
+};
+class Cat :public Animal
+{
+public:
+	Cat(string name) :Animal(name) {}
+	void bark() { cout << _name << "bark：miao miao!" << endl; }
+};
+class Dog :public Animal
+{
+public:
+	Dog(string name) :Animal(name) {}
+	void bark() { cout << _name << "bark：wang wang!" << endl; }
+};
+int main()
+{
+	Animal* p1 = new Cat("加菲猫");//vfprt -> Dog  vftable
+	Animal* p2 = new Dog("二哈");//vfptr -> Cat vftable
 
+	int* p11 = (int*)p1;
+	int* p22= (int*)p2;
+	int tmp = p11[0]; //p11[0]访问的就是Cat的前四个字节
+	p11[0] = p22[0];//p22[0]访问的就是Dog的前四个字节
+	p22[0] = tmp;
+	
+	p1->bark();//p1->Cat vfptr  -> Dog vftable bark
+	p2->bark();//p2->Dog vfptr  -> Cat vftable bark
 
-				
+	delete p1;
+	delete p2;
+	return 0;
+}
+*/
+/*
+2
+class Base
+{
+public:
+	virtual void show(int i = 10)
+	{
+		cout << "call Base ::show i：" << i << endl;
+	}
+};
+class Derive :public Base
+{
+public:
+	void show(int i = 20)
+	{
+		cout << "call Derive::show i：" << i << endl;
+	}
+};
+int main()
+{
+	Base* p = new Derive();
+	
+	//push 0Ah=>函数调用，参数压栈是在编译时期就确定好的
+	//mov eax,dword ptr[p]
+	//mov ecx,dword ptr[eax]
+	//call ecx;
+	
+	p->show();
+	delete p;
+	return 0;
+}
+*/
+/*
+3
+class Base
+{
+public:
+	virtual void show()
+	{
+		cout << "call Base ::show i：" << endl;
+	}
+};
+class Derive :public Base
+{
+private:
+	void show()
+	{
+		cout << "call Derive::show i：" << endl;
+	}
+};
+int main()
+{
+	Base* p = new Derive();
+	//成员方法的访问权限是在编译阶段就确定了
+	p->show();  //最终能调用到Derive::show是在运行时期才确定的
+	delete p;
+	return 0;
+}
+*/
+/*4
+class Base
+{
+public:
+	Base()
+	{
+		cout << "call Base()" << endl;
+		clear();
+	}
+	void clear()
+	{
+		memset(this, 0, sizeof(*this));
+	}
+	virtual void show()
+	{
+		cout << "call Base::show()" << endl;
+	}
+};
+class Derive :public Base
+{
+public:
+	Derive()
+	{
+		cout << "call Derive()" << endl;
+	}
+	void show()
+	{
+		cout << "call Derive::show()" << endl;
+	}
+};
+int main()
+{
+	//pb1调用有问题，问题出在构造函数中的clear
+	Base* pb1 = new Base();
+	pb1->show();//动态绑定
+	delete pb1;
+	//pb2调用没有问题
+	Base* pb2 = new Derive();
+	pb2->show();//动态绑定
+	delete pb2;
+
+	return 0;
+}
+*/
+
+//8.虚基类和虚继承
+#if 0
+/*
+virtual:
+1.修饰成员方式是虚函数
+2.可以修饰继承方式，是虚继承
+虚基类：被虚继承的类，称作虚基类。
+*/
+class A
+{
+public:
+	virtual void func() { cout << "call A::func" << endl; }
+	void operator delete(void* ptr)
+	{
+		cout << "operator delete p：" << ptr << endl;
+		free(ptr);
+	}
+private:
+	int ma;
+};
+class B :virtual public A
+{
+public:
+	void func() { cout << "call B::func" << endl; }
+	void* operator new(size_t size)
+	{
+		void* p = malloc(size);
+		cout << "operator new p :" << p << endl;
+		return p;
+	}
+private:
+	int mb;
+};
+/*
+正常继承：
+A a：4个字节
+B b：8个字节
+虚继承：
+A a：4个字节
+B b：12个字节
+*/
+int main()
+{
+	
+	B b;
+	A* p = &b;
+	//基类指针指向派生类对象，永远指向的是派生类中基类部分的起始地址
+	//A* p = newb;//B::vftable
+	cout << "main p:" << p << endl;
+	p->func();
+	//delete p;
+	return 0;
+}
+#endif
+
+//9.C++的多继承：可以做更多代码的复用
+#if 0
+/*
+菱形继承的问题：使得派生类有多份间接基类的数据
+使用虚继承，解决菱形继承的问题。
+注意：
+1.哪个类的数据会被多份继承，就使哪个类为虚基类
+2.只要是对于虚基类的继承，都要使用virtual
+3.在最终类中，要调用虚基类的构造函数，对虚基类成员进行初始化。
+*/
+class A
+{
+public:
+	A(int data) :ma(data) { cout << "A()" << endl; }
+	~A() { cout << "~A()" << endl; }
+protected:
+	int ma;
+};
+class B :virtual public A
+{
+public:
+	B(int data) :A(data), mb(data) { cout << "B()" << endl; }
+	~B() { cout << "~B()" << endl; }
+protected:
+	int mb;
+};
+class C :virtual public A
+{
+public:
+	C(int data) :A(data), mc(data) { cout << "C()" << endl; }
+	~C() { cout << "~C()" << endl; }
+protected:
+	int mc;
+};
+class D :public B,public C
+{
+public:
+	D(int data) :A(data), B(data), C(data), md(data) { cout << "D()" << endl; }
+	~D(){ cout << "~D()" << endl; }
+protected:
+	int md;
+};
+int main()
+{
+	D d(10);
+	return 0;
+}
+#endif
+
+//10.C++的四种类型转换
+#if 0
+/*
+1.const_cast：去掉常量属性的一个类型转换，只能调节类型限定符，不能更改基础类型。
+例如：
+const int a = 10;//类型限定符 const, 基础类型 int 
+char* p2 = const_cast<char*>(&a);//只能调节类型限定符，去掉常属性，不能更改基础类型int为char
+2.static_cast：提供编译器认为安全的类型转换
+3.reinterpret_cast：类似于C风格的强制类型转换
+4.dynamic_cast：主要用在继承结构中，可以支持RTTI类型识别的上下转换
+*/
+class Base
+{
+public:
+	virtual void func() = 0;
+};
+class Derive1 :public Base
+{
+public:
+	void func() { cout << "call Derive1::func()" << endl; }
+};
+class Derive2 :public Base
+{
+public:
+	void func() { cout << "call Derive2::func()" << endl; }
+	//Derive2实现新功能的API接口函数
+	void derive02func() { cout << "call Derive2::derive02func()" << endl; }
+};
+void showFunc(Base* p)
+{
+	/*
+	问题：
+	如果指针指向的不是Derive2的对象，则按照正常逻辑调用所指类型的虚函数，
+	如果是Derive2的对象就更改功能，使其调用Derive2类中的derive02func()，该怎么做？
+	*/
+	//dynamic_cast会检查p指针是否指向的是一个Derive2类型的对象
+	//p->vfptr->vftable RTTI信息
+	//如果是，dynamic_cast转换类型成功，返回Deriver2对象的地址，给pd2；否则返回nullptr
+	Derive2* pd2 = dynamic_cast<Derive2*>(p);
+	if (pd2 != nullptr)
+	{
+		pd2->derive02func();
+	}
+	else
+	{
+		p->func();//动态绑定  
+	}
+}
+int main()
+{
+	/*
+	1.const_cast<这里面必须是指针int*或者引用int&类型>：仅用于去掉常量属性的场景
+	const int a = 10;
+	int* p1 = (int*)&a;
+	int* p2 = const_cast<int*>(&a);
+	*/
+	/*
+	2.static_cast：支持基类和派生类之间的相互转换
+	//正确
+	int a = 10;
+	char b = static_cast<int>(a);
+	//错误
+	int* p = nullptr;
+	short* pb = static_cast<short*>(p);
+	*/
+	Derive1 d1;
+	Derive2 d2;
+	showFunc(&d1);
+	showFunc(&d2);
+	return 0;
+}
+#endif
